@@ -1,0 +1,20 @@
+server:
+  port: 8084
+spring:
+  application:
+    name: ProductService
+  datasource:
+    password: password
+    url: jdbc:postgresql://localhost:5436/productService
+    username: acme
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: true
+  graphql:
+    graphiql:
+      enabled: true
