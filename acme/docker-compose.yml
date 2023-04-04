@@ -1,0 +1,54 @@
+services:
+  postgres-product:
+    container_name: Product-db
+    image: postgres
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: password
+      PGDATA: /data/postgresUser
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres-product
+    restart: unless-stopped
+
+  ##SHOP
+  postgres-review:
+    container_name: Review-db
+    image: postgres
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: password
+      PGDATA: /data/postgresShop
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - "5433:5432"
+    networks:
+      - postgres-review
+    restart: unless-stopped
+
+  ##Adminer
+  adminer:
+    container_name: adminer
+    image: adminer
+    ports:
+      - "5050:5050"
+    networks:
+      - postgres-product
+      - postgres-review
+
+    restart: unless-stopped
+
+networks:
+  postgres-product:
+    driver: bridge
+  postgres-review:
+    driver: bridge
+
+volumes:
+  postgres:
+  pgadmin:
+

@@ -1,11 +1,11 @@
 server:
-  port: 8083
+  port: 8084
 spring:
   application:
-    name: ProductService
+    name: ReviewService
   datasource:
     password: password
-    url: jdbc:postgresql://localhost:5432/productService
+    url: jdbc:postgresql://localhost:5433/reviewService
     username: root
   jpa:
     hibernate:
