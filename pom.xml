@@ -12,9 +12,14 @@
 	<artifactId>ACME</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>ACME</name>
-	<description>A simple Spring Boot Project</description>
+	<description>INSIS Project</description>
 	<properties>
-		<java.version>19</java.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.source>17</maven.compiler.source>
+		<maven.compiler.target>17</maven.compiler.target>
+		<spring.boot.maven.plugin.version>2.7.6</spring.boot.maven.plugin.version>
+		<spring.boot.dependencies.version>2.7.6</spring.boot.dependencies.version>
+		<swagger.version>2.9.2</swagger.version>
 		<!-- automatically run annotation processors within the incremental compilation -->
 		<m2e.apt.activation>jdt_apt</m2e.apt.activation>
 	</properties>
@@ -120,11 +125,7 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<compilerArgs>
-						<arg>-parameters</arg>
-					</compilerArgs>
-				</configuration>
+				<version>${spring.boot.maven.plugin.version}</version>
 			</plugin>
 
 			<plugin>
