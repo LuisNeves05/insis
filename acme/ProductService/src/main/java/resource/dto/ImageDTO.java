@@ -1,6 +1,6 @@
 package resource.dto;
 
-import com.isep.acme.services.ImageService;
+import resource.service.ImageService;
 
 public class ImageDTO {
 
