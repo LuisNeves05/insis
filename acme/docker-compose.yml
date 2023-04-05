@@ -5,7 +5,8 @@ services:
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: password
-      PGDATA: /data/postgresUser
+      POSTGRES_DB: product-db
+      PGDATA: /data/postgresProduct
     volumes:
       - postgres:/data/postgres
     ports:
@@ -21,7 +22,8 @@ services:
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: password
-      PGDATA: /data/postgresShop
+      POSTGRES_DB: review-db
+      PGDATA: /data/postgresReview
     volumes:
       - postgres:/data/postgres
     ports:
@@ -35,7 +37,7 @@ services:
     container_name: adminer
     image: adminer
     ports:
-      - "5050:5050"
+      - "8080:8080"
     networks:
       - postgres-product
       - postgres-review
@@ -50,5 +52,5 @@ networks:
 
 volumes:
   postgres:
-  pgadmin:
+  adminer:
 
