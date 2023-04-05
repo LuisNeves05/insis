@@ -5,7 +5,7 @@ spring:
     name: ReviewService
   datasource:
     password: password
-    url: jdbc:postgresql://localhost:5433/postgresReview
+    url: jdbc:postgresql://localhost:5433/review-db
     username: root
   jpa:
     hibernate:

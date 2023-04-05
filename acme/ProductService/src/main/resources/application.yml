@@ -5,7 +5,7 @@ spring:
     name: ProductService
   datasource:
     password: password
-    url: jdbc:postgresql://192.168.1.66:5432/product-db
+    url: jdbc:postgresql://localhost:5432/product-db
     username: root
   jpa:
     hibernate:
@@ -15,5 +15,7 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
     show-sql: true
+file:
+  uploadDir: DEV/FileUploads
 
 
