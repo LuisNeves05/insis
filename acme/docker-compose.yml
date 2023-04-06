@@ -1,35 +1,71 @@
 services:
-  postgres-product:
-    container_name: Product-db
+
+  ##PRODUCT WRITE
+  postgres-product-w:
+    container_name: Product-db-w
     image: postgres
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: product-db
-      PGDATA: /data/postgresProduct
+      POSTGRES_DB: product-db-w
+      PGDATA: /data/postgresProductW
     volumes:
       - postgres:/data/postgres
     ports:
       - "5432:5432"
     networks:
-      - postgres-product
+      - postgres-product-w
     restart: unless-stopped
 
-  ##SHOP
-  postgres-review:
-    container_name: Review-db
+  ##PRODUCT READ
+  postgres-product-r:
+    container_name: Product-db-r
     image: postgres
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: review-db
-      PGDATA: /data/postgresReview
+      POSTGRES_DB: product-db-r
+      PGDATA: /data/postgresProductR
     volumes:
       - postgres:/data/postgres
     ports:
       - "5433:5432"
     networks:
-      - postgres-review
+      - postgres-product-r
+    restart: unless-stopped
+
+  ##REVIEW WRITE
+  postgres-review-w:
+    container_name: Review-db-w
+    image: postgres
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: review-db-w
+      PGDATA: /data/postgresReviewW
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - "5434:5432"
+    networks:
+      - postgres-review-w
+    restart: unless-stopped
+
+  ##REVIEW READ
+  postgres-review-r:
+    container_name: Review-db-r
+    image: postgres
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: review-db-r
+      PGDATA: /data/postgresReviewR
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - "5435:5432"
+    networks:
+      - postgres-review-r
     restart: unless-stopped
 
   ##Adminer
@@ -39,15 +75,21 @@ services:
     ports:
       - "8080:8080"
     networks:
-      - postgres-product
-      - postgres-review
+      - postgres-product-r
+      - postgres-review-r
+      - postgres-product-w
+      - postgres-review-w
 
     restart: unless-stopped
 
 networks:
-  postgres-product:
+  postgres-product-w:
     driver: bridge
-  postgres-review:
+  postgres-review-w:
+    driver: bridge
+  postgres-product-r:
+    driver: bridge
+  postgres-review-r:
     driver: bridge
 
 volumes:

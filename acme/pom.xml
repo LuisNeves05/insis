@@ -10,8 +10,10 @@
     <version>1.0-SNAPSHOT</version>
 
     <modules>
-        <module>ProductService</module>
-        <module>ReviewService</module>
+        <module>ProductServiceWrite</module>
+        <module>ProductServiceRead</module>
+        <module>ReviewServiceRead</module>
+        <module>ReviewServiceWrite</module>
     </modules>
 
     <name>ACME</name>

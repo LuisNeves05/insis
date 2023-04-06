@@ -1,0 +1,21 @@
+server:
+  port: 8081
+spring:
+  application:
+    name: ProductServiceRead
+  datasource:
+    password: password
+    url: jdbc:postgresql://localhost:5433/product-db-r
+    username: root
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: true
+file:
+  uploadDir: DEV/FileUploads
+
+
