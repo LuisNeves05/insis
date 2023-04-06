@@ -46,7 +46,7 @@ public class Review {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private Usertest user;
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
     private Rating rating;
@@ -62,7 +62,7 @@ public class Review {
         setFunFact(funFact);
     }
 
-    public Review(final Long idReview, final long version, final String approvalStatus, final  String reviewText, final List<Vote> upVote, final List<Vote> downVote, final String report, final LocalDate publishingDate, final String funFact, Product product, Rating rating, User user) {
+    public Review(final Long idReview, final long version, final String approvalStatus, final  String reviewText, final List<Vote> upVote, final List<Vote> downVote, final String report, final LocalDate publishingDate, final String funFact, Product product, Rating rating, Usertest user) {
         this(idReview, version, approvalStatus, reviewText, publishingDate, funFact);
 
         setUpVote(upVote);
@@ -74,7 +74,7 @@ public class Review {
 
     }
 
-    public Review(final String reviewText, LocalDate publishingDate, Product product, String funFact, Rating rating, User user) {
+    public Review(final String reviewText, LocalDate publishingDate, Product product, String funFact, Rating rating, Usertest user) {
         setReviewText(reviewText);
         setProduct(product);
         setPublishingDate(publishingDate);
@@ -156,11 +156,11 @@ public class Review {
         return product;
     }
 
-    public User getUser() {
+    public Usertest getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(Usertest user) {
         this.user = user;
     }
 

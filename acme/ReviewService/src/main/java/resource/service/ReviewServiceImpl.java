@@ -52,18 +52,18 @@ public class ReviewServiceImpl implements ReviewService {
 
         Rating rating = null;
         Optional<Rating> r = ratingService.findByRate(createReviewDTO.getRating());
-        if(r.isPresent()) {
+        if (r.isPresent()) {
             rating = r.get();
         }
 
         LocalDate date = LocalDate.now();
 
-        String funfact =  "a";//restService.getFunFact(date);
+        String funfact = "a";//restService.getFunFact(date);
 
         if (funfact == null) return null;
 
         //TODO remove null user and product at the end
-        Review review = new Review(createReviewDTO.getReviewText(), date, null, funfact, rating);
+        Review review = new Review(createReviewDTO.getReviewText(), date, null, "", null, null);
 
         review = repository.save(review);
 
@@ -109,7 +109,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public Double getWeightedAverage(Product product){
+    public Double getWeightedAverage(Product product) {
 
         Optional<List<Review>> r = repository.findByProductId(product);
 
@@ -117,23 +117,23 @@ public class ReviewServiceImpl implements ReviewService {
 
         double sum = 0;
 
-        for (Review rev: r.get()) {
+        for (Review rev : r.get()) {
             Rating rate = rev.getRating();
 
-            if (rate != null){
+            if (rate != null) {
                 sum += rate.getRate();
             }
         }
 
-        return sum/r.get().size();
+        return sum / r.get().size();
     }
 
     @Override
-    public Boolean DeleteReview(Long reviewId)  {
+    public Boolean DeleteReview(Long reviewId) {
 
         Optional<Review> rev = repository.findById(reviewId);
 
-        if (rev.isEmpty()){
+        if (rev.isEmpty()) {
             return null;
         }
         Review r = rev.get();
@@ -146,11 +146,11 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public List<ReviewDTO> findPendingReview(){
+    public List<ReviewDTO> findPendingReview() {
 
         Optional<List<Review>> r = repository.findPendingReviews();
 
-        if(r.isEmpty()){
+        if (r.isEmpty()) {
             return null;
         }
 
@@ -162,13 +162,13 @@ public class ReviewServiceImpl implements ReviewService {
 
         Optional<Review> r = repository.findById(reviewID);
 
-        if(r.isEmpty()){
+        if (r.isEmpty()) {
             throw new ResourceNotFoundException("Review not found");
         }
 
         Boolean ap = r.get().setApprovalStatus(approved);
 
-        if(!ap) {
+        if (!ap) {
             throw new IllegalArgumentException("Invalid status value");
         }
 

@@ -1,10 +1,12 @@
 package resource.model;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 
-public class User {
+public class Usertest {
 
     private static final long serialVersionUID = 1L;
 
@@ -15,12 +17,13 @@ public class User {
     @Column(unique = true)
     private String username;
 
-/*    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Review> review = new ArrayList<Review>(); */
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Review> review = new ArrayList<>();
 
-    protected User() {}
+    protected Usertest() {
+    }
 
-    public User(final String username){
+    public Usertest(final String username) {
         this.username = username;
     }
 
