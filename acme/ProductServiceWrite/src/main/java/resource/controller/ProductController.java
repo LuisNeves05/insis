@@ -57,4 +57,9 @@ class ProductController {
         service.deleteBySku(sku);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping(value = "/teste")
+    public String publishProductMessage(@RequestBody String product) {
+        return service.publishProductMessage(product);
+    }
 }

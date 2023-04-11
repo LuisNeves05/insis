@@ -1,5 +1,6 @@
 package resource.service;
 
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import resource.dto.ProductDTO;
@@ -13,7 +14,7 @@ import java.util.Optional;
 
 @Service
 public class ProductServiceImpl implements ProductService {
-
+    public static final String PRODUCT_QUEUE = "product-queue";
     @Autowired
     private ProductRepository repository;
 
@@ -64,5 +65,10 @@ public class ProductServiceImpl implements ProductService {
             return null;
         else
             return new ProductDetailDTO(p.get().getSku(), p.get().getDesignation(), p.get().getDescription());
+    }
+
+    @RabbitListener(queues = PRODUCT_QUEUE)
+    public void receiveMessageAndCreateProduct(String product) {
+        System.out.println("AAAAAAAAAAAAA" + product);
     }
 }
