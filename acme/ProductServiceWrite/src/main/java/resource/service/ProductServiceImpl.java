@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import resource.ProductServiceWriteApplication;
 import resource.dto.ProductDTO;
 import resource.model.Product;
+import resource.property.RabbitMQConfig;
 import resource.repository.ProductRepository;
 
 import java.util.Optional;
@@ -22,7 +23,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public String publishProductMessage(String product) {
         this.rabbitMessagingTemplate.setMessageConverter(this.mappingJackson2MessageConverter);
-        this.rabbitMessagingTemplate.convertAndSend(ProductServiceWriteApplication.PRODUCT_EXCHANGE, ProductServiceWriteApplication.PRODUCT_ROUTING_KEY,product);
+        this.rabbitMessagingTemplate.convertAndSend(RabbitMQConfig.PRODUCT_EXCHANGE, RabbitMQConfig.PRODUCT_ROUTING_KEY,product);
         return "Product Message Published";
     }
     @Autowired
