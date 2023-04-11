@@ -7,8 +7,10 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.converter.DefaultClassMapper;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.amqp.utils.SerializationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 import resource.dto.ProductDTO;
 import resource.dto.ProductDetailDTO;
@@ -93,22 +95,13 @@ public class ProductServiceImpl implements ProductService {
 
 
     @RabbitListener(queues = PRODUCT_QUEUE)
-    public void receiveMessageAndCreateProduct(Delivery delivery) {
-        try {
-            System.out.println("####################################");
-            byte[] objectBytes = delivery.getBody();
-            ByteArrayInputStream bis = new ByteArrayInputStream(objectBytes);
-            ObjectInputStream ois = new ObjectInputStream(bis);
-            CreateProductCommand myObject = (CreateProductCommand) ois.readObject();
-            System.out.println("#############################################################################");
-            System.out.println("#############################################################################");
-            System.out.println("#############################################################################");
-            System.out.println(myObject);
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+    public void receiveMessageAndCreateProduct(byte[] messageBytes) {
+        CreateProductCommand event = (CreateProductCommand) SerializationUtils.deserialize(messageBytes);
 
-
+        System.out.println(event.getSku());
+        System.out.println(event.getDescription());
+        System.out.println(event.getDesignation());
+        System.out.println(event);
 
         // update the read database
         //repository.save(event);

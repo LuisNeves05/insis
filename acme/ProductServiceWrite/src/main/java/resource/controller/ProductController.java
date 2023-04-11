@@ -26,7 +26,7 @@ class ProductController {
     private ProductService service;
 
     @Operation(summary = "creates a product")
-    @PostMapping
+    @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<ProductDTO> create(@RequestBody Product manager) {
         try {

@@ -2,6 +2,7 @@ package resource.service.command_bus;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.io.Serializable;
 
@@ -17,4 +18,6 @@ public class CreateProductCommand implements Serializable {
         this.description = description;
         this.designation = designation;
     }
+
+
 }
