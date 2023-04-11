@@ -1,10 +1,8 @@
 package resource.service;
 
 import resource.dto.ProductDTO;
-import resource.dto.ProductDetailDTO;
 import resource.model.Product;
-
-import java.util.Optional;
+import resource.service.command_bus.CreateProductCommand;
 
 public interface ProductService {
 
@@ -12,7 +10,7 @@ public interface ProductService {
 
     ProductDTO updateBySku(final String sku, final Product product);
 
-    String publishProductMessage(String product);
+    void publishProductMessage(byte[] payload);
 
     void deleteBySku(final String sku);
 }
