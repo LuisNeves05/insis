@@ -12,9 +12,12 @@ public class CreateReviewCommand implements Serializable {
     private Long userID;
     private Double rating;
 
-    public CreateReviewCommand(String reviewText, Long userID, Double rating) {
+    private String productSku;
+
+    public CreateReviewCommand(String reviewText, Long userID, Double rating, String productSku) {
         this.reviewText = reviewText;
         this.userID = userID;
         this.rating = rating;
+        this.productSku = productSku;
     }
 }

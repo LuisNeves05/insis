@@ -14,6 +14,8 @@ import resource.repository.ProductRepository;
 import resource.repository.ReviewRepository;
 import resource.repository.UserRepository;
 import resource.service.command_bus.CreateReviewCommand;
+import resource.service.command_bus.DeleteReviewCommand;
+import resource.service.command_bus.ModerateReviewCommand;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -133,7 +135,63 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     private byte[] serializeObject(Review r) {
-        CreateReviewCommand event = new CreateReviewCommand(r.getReviewText(), r.getUser().getUserId(),r.getRating().getRate());
+        CreateReviewCommand event = new CreateReviewCommand(r.getReviewText(), r.getUser().getUserId(),r.getRating().getRate(), r.getProduct().getSku());
         return SerializationUtils.serialize(event);
+    }
+
+    public void create(final CreateReviewCommand r) {
+
+        final Optional<Product> product = pRepository.findBySku(r.getProductSku());
+
+        if(product.isEmpty()) return;
+
+        final var user = uRepository.getById(r.getUserID());
+
+        Rating rating = null;
+        Optional<Rating> ra = ratingService.findByRate(r.getRating());
+        if (ra.isPresent()) {
+            rating = ra.get();
+        }
+
+        LocalDate date = LocalDate.now();
+
+        String funfact = "123";
+
+        Review review = new Review(r.getReviewText(), date, product.orElse(null), funfact, rating, user);
+
+        review = repository.save(review);
+
+        publishReviewMessage(serializeObject(review), RabbitMQConfig.REVIEW_CREATE_RK);
+    }
+
+    public void moderateReview(ModerateReviewCommand mr) throws ResourceNotFoundException, IllegalArgumentException {
+
+        Optional<Review> r = repository.findById(mr.getReviewId());
+
+        if (r.isEmpty()) {
+            throw new ResourceNotFoundException("Review not found");
+        }
+
+        Boolean ap = r.get().setApprovalStatus(mr.getApproved());
+
+        if (!ap) {
+            throw new IllegalArgumentException("Invalid status value");
+        }
+
+        repository.save(r.get());
+    }
+
+    public void deleteReview(DeleteReviewCommand dr) {
+
+        Optional<Review> rev = repository.findById(dr.reviewId());
+
+        if (rev.isEmpty()) {
+            return;
+        }
+        Review r = rev.get();
+
+        if (r.getUpVote().isEmpty() && r.getDownVote().isEmpty()) {
+            repository.delete(r);
+        }
     }
 }

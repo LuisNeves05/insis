@@ -1,126 +1,72 @@
 package resource.service;
 
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.amqp.rabbit.annotation.*;
+import org.springframework.amqp.support.converter.DefaultClassMapper;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.amqp.utils.SerializationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import resource.broker.RabbitMQConfig;
-import resource.controller.ResourceNotFoundException;
-import resource.dto.CreateReviewDTO;
-import resource.dto.ReviewDTO;
-import resource.dto.VoteReviewDTO;
-import resource.model.*;
+import resource.dto.ProductDTO;
+import resource.model.Product;
+import resource.repository.ProductRepository;
+import org.springframework.messaging.handler.annotation.Header;
 import resource.repository.ReviewRepository;
+import resource.service.command_bus.CreateReviewCommand;
+import resource.service.command_bus.DeleteReviewCommand;
+import resource.service.command_bus.ModerateReviewCommand;
 
-import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ReviewServiceRabbit implements ReviewService {
+public class ReviewServiceRabbit {
 
     @Autowired
-    ReviewRepository repository;
-    @Autowired
-    private RabbitTemplate rabbitMessagingTemplate;
+    private ReviewServiceImpl service;
 
     @Autowired
-    RatingService ratingService;
+    private ReviewRepository repository;
 
-    @Override
-    public ReviewDTO create(final CreateReviewDTO createReviewDTO, String sku) {
-
-        //final Optional<Product> product = pRepository.findBySku(sku);
-
-        // if(product.isEmpty()) return null;
-
-        //final var user = userService.getUserId(createReviewDTO.getUserID());
-
-        Rating rating = null;
-        Optional<Rating> r = ratingService.findByRate(createReviewDTO.getRating());
-        if (r.isPresent()) {
-            rating = r.get();
-        }
-
-        LocalDate date = LocalDate.now();
-
-        String funfact = "a";//restService.getFunFact(date);
-
-        if (funfact == null) return null;
-
-        //TODO remove null user and product at the end
-        Review review = new Review(createReviewDTO.getReviewText(), date, null, "", null, null);
-
-        review = repository.save(review);
-
-        return ReviewMapper.toDto(review);
+    @Bean
+    public MessageConverter jsonMessageConverter(ObjectMapper objectMapper) {
+        Jackson2JsonMessageConverter converter = new Jackson2JsonMessageConverter(objectMapper);
+        converter.setClassMapper(new DefaultClassMapper());
+        converter.setCreateMessageIds(true);
+        return converter;
     }
 
-    @Override
-    public boolean addVoteToReview(Long reviewID, VoteReviewDTO voteReviewDTO) {
+    @RabbitListener(queues = "#{queue_main.name}")
+    public void receiveMessageAndDistribute(byte[] messageBytes, @Header("amqp_receivedRoutingKey") String routingKey) {
 
-        Optional<Review> review = this.repository.findById(reviewID);
+        System.out.println("#############################################");
+        System.out.println("Received Message");
+        System.out.println("Doing a: ");
+        System.out.println(routingKey);
+        System.out.println("#############################################");
 
-        if (review.isEmpty()) return false;
-
-        Vote vote = new Vote(voteReviewDTO.getVote(), voteReviewDTO.getUserID());
-        if (voteReviewDTO.getVote().equalsIgnoreCase("upVote")) {
-            boolean added = review.get().addUpVote(vote);
-            if (added) {
-                Review reviewUpdated = this.repository.save(review.get());
-                return reviewUpdated != null;
+        switch (routingKey) {
+            case RabbitMQConfig.REVIEW_CREATE_RK -> {
+                CreateReviewCommand event = (CreateReviewCommand) SerializationUtils.deserialize(messageBytes);
+                service.create(event);
             }
-        } else if (voteReviewDTO.getVote().equalsIgnoreCase("downVote")) {
-            boolean added = review.get().addDownVote(vote);
-            if (added) {
-                Review reviewUpdated = this.repository.save(review.get());
-                return reviewUpdated != null;
+            case RabbitMQConfig.REVIEW_DELETE_RK -> {
+                DeleteReviewCommand deleteReviewCommand =
+                        (DeleteReviewCommand) SerializationUtils.deserialize(messageBytes);
+                service.deleteReview(deleteReviewCommand);
+            }
+            // TODO VER ISTO DOS VOTOS E COMO VAI FICAR
+            /*case RabbitMQConfig.REVIEW_ADD_DOWN_VOTE_RK -> service.addVoteToReview();
+            case RabbitMQConfig.REVIEW_ADD_UP_VOTE_RK -> service.addVoteToReview(); */
+            case RabbitMQConfig.REVIEW_MODERATE_RK -> {
+                ModerateReviewCommand moderateReviewCommand =
+                        (ModerateReviewCommand) SerializationUtils.deserialize(messageBytes);
+                service.moderateReview(moderateReviewCommand);
             }
         }
-        return false;
     }
 
-    @Override
-    public Boolean DeleteReview(Long reviewId) {
 
-        Optional<Review> rev = repository.findById(reviewId);
-
-        if (rev.isEmpty()) {
-            return null;
-        }
-        Review r = rev.get();
-
-        if (r.getUpVote().isEmpty() && r.getDownVote().isEmpty()) {
-            repository.delete(r);
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public ReviewDTO moderateReview(Long reviewID, String approved) throws ResourceNotFoundException, IllegalArgumentException {
-
-        Optional<Review> r = repository.findById(reviewID);
-
-        if (r.isEmpty()) {
-            throw new ResourceNotFoundException("Review not found");
-        }
-
-        Boolean ap = r.get().setApprovalStatus(approved);
-
-        if (!ap) {
-            throw new IllegalArgumentException("Invalid status value");
-        }
-
-        Review review = repository.save(r.get());
-
-        return ReviewMapper.toDto(review);
-    }
-
-    @Override
-    public void publishReviewMessage(byte[] payload, String routingKey) {
-        this.rabbitMessagingTemplate.convertAndSend(
-                RabbitMQConfig.EXCHANGE,
-                routingKey,
-                payload);
-    }
 }
