@@ -4,7 +4,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import resource.model.Product;
 import resource.model.Review;
-import resource.model.Usertest;
+import resource.model.User;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,5 +28,5 @@ public interface ReviewRepository extends CrudRepository<Review, Long> {
     Optional<List<Review>> findByProductIdStatus(Product product, String status);
 
     @Query("SELECT r FROM Review r WHERE r.user=:user ORDER BY r.publishingDate DESC")
-    Optional<List<Review>> findByUserId(Usertest user);
+    Optional<List<Review>> findByUserId(User user);
 }

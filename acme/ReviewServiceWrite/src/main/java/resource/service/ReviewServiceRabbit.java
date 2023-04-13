@@ -9,37 +9,31 @@ import resource.dto.CreateReviewDTO;
 import resource.dto.ReviewDTO;
 import resource.dto.VoteReviewDTO;
 import resource.model.*;
-import resource.repository.ProductRepository;
 import resource.repository.ReviewRepository;
-import resource.repository.UserRepository;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ReviewServiceImpl implements ReviewService {
+public class ReviewServiceRabbit implements ReviewService {
 
     @Autowired
     ReviewRepository repository;
     @Autowired
     private RabbitTemplate rabbitMessagingTemplate;
-    @Autowired
-    ProductRepository pRepository;
-    @Autowired
-    UserRepository uRepository;
+
     @Autowired
     RatingService ratingService;
 
-    // TODO review everything
     @Override
     public ReviewDTO create(final CreateReviewDTO createReviewDTO, String sku) {
 
-        final Optional<Product> product = pRepository.findBySku(sku);
+        //final Optional<Product> product = pRepository.findBySku(sku);
 
-         if(product.isEmpty()) return null;
+        // if(product.isEmpty()) return null;
 
-        final var user = uRepository.getById(createReviewDTO.getUserID());
+        //final var user = userService.getUserId(createReviewDTO.getUserID());
 
         Rating rating = null;
         Optional<Rating> r = ratingService.findByRate(createReviewDTO.getRating());
@@ -49,9 +43,12 @@ public class ReviewServiceImpl implements ReviewService {
 
         LocalDate date = LocalDate.now();
 
-        String funfact = "123";
+        String funfact = "a";//restService.getFunFact(date);
 
-        Review review = new Review(createReviewDTO.getReviewText(), date, product.orElse(null), funfact, rating, user);
+        if (funfact == null) return null;
+
+        //TODO remove null user and product at the end
+        Review review = new Review(createReviewDTO.getReviewText(), date, null, "", null, null);
 
         review = repository.save(review);
 
