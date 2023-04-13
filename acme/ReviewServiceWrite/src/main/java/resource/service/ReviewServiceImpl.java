@@ -13,11 +13,13 @@ import resource.model.*;
 import resource.repository.ProductRepository;
 import resource.repository.ReviewRepository;
 import resource.repository.UserRepository;
+import resource.service.command_bus.CreateProductCommand;
 import resource.service.command_bus.CreateReviewCommand;
 import resource.service.command_bus.DeleteReviewCommand;
 import resource.service.command_bus.ModerateReviewCommand;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -33,6 +35,42 @@ public class ReviewServiceImpl implements ReviewService {
     UserRepository uRepository;
     @Autowired
     RatingService ratingService;
+
+
+
+    @Override
+    public List<ReviewDTO> findReviewsByUser(Long userID) {
+
+        final Optional<UserR> user = uRepository.findById(userID);
+
+        if(user.isEmpty()) return null;
+
+        Optional<List<Review>> r = repository.findByUserId(user.get());
+
+        return r.map(ReviewMapper::toDtoList).orElse(null);
+
+    }
+
+    @Override
+    public List<ReviewDTO> getReviewsOfProduct(String sku, String status) {
+
+        Optional<Product> product = pRepository.findBySku(sku);
+        if( product.isEmpty() ) return null;
+
+        Optional<List<Review>> r = repository.findByProductIdStatus(product.get(), status);
+
+        return r.map(ReviewMapper::toDtoList).orElse(null);
+
+    }
+
+    @Override
+    public List<ReviewDTO> findPendingReview(){
+
+        Optional<List<Review>> r = repository.findPendingReviews();
+
+        return r.map(ReviewMapper::toDtoList).orElse(null);
+
+    }
 
     @Override
     public ReviewDTO create(final CreateReviewDTO createReviewDTO, String sku) {
@@ -193,5 +231,30 @@ public class ReviewServiceImpl implements ReviewService {
         if (r.getUpVote().isEmpty() && r.getDownVote().isEmpty()) {
             repository.delete(r);
         }
+    }
+
+    public void createProduct(final CreateProductCommand product) {
+        final Product p = new Product(product.getSku(), product.getDesignation(), product.getDescription());
+
+        if(pRepository.findBySku(product.getSku()).orElse(null) == null){
+            pRepository.save(p).toDto();
+        }
+    }
+
+    public void updateProductBySku(CreateProductCommand product) {
+
+        final Optional<Product> productToUpdate = pRepository.findBySku(product.getSku());
+
+        if (productToUpdate.isEmpty()) return;
+
+        productToUpdate.get().updateProduct(new Product(product.getSku(),product.getDesignation(),product.getDescription()));
+
+        pRepository.save(productToUpdate.get());
+    }
+
+    public void deleteProductBySku(CreateProductCommand p) {
+
+        pRepository.findBySku(p.getSku()).ifPresent(pr -> pRepository.deleteBySku(p.getSku()));
+
     }
 }

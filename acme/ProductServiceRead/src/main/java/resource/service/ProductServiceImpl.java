@@ -59,16 +59,13 @@ public class ProductServiceImpl implements ProductService {
 
         Optional<Product> p = repository.findBySku(sku);
 
-        if (p.isEmpty())
-            return null;
-        else
-            return new ProductDetailDTO(p.get().getSku(), p.get().getDesignation(), p.get().getDescription());
+        return p.map(product -> new ProductDetailDTO(product.getSku(), product.getDesignation(), product.getDescription())).orElse(null);
     }
 
     public void create(final CreateProductCommand product) {
         final Product p = new Product(product.getSku(), product.getDesignation(), product.getDescription());
 
-        if (repository.findBySku(product.getSku()).isPresent()) {
+        if(repository.findBySku(product.getSku()).orElse(null) == null){
             repository.save(p).toDto();
         }
     }
@@ -79,7 +76,7 @@ public class ProductServiceImpl implements ProductService {
 
         if (productToUpdate.isEmpty()) return;
 
-        productToUpdate.get().updateProduct(product);
+        productToUpdate.get().updateProduct(new Product(product.getSku(),product.getDesignation(),product.getDescription()));
 
         repository.save(productToUpdate.get());
     }

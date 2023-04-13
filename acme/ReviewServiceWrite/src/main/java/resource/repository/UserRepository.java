@@ -8,37 +8,37 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import resource.controller.ResourceNotFoundException;
-import resource.model.User;
+import resource.model.UserR;
 
 import java.util.Optional;
 
 @Repository
 @CacheConfig(cacheNames = "users")
-public interface UserRepository extends CrudRepository<User, Long> {
+public interface UserRepository extends CrudRepository<UserR, Long> {
 
     @Override
     @Caching(evict = {
             @CacheEvict(key = "#p0.userId", condition = "#p0.userId != null"),
             @CacheEvict(key = "#p0.username", condition = "#p0.username != null") })
-    <S extends User> S save(S entity);
+    <S extends UserR> S save(S entity);
 
     @Override
     @Cacheable
-    Optional<User> findById(Long userId);
+    Optional<UserR> findById(Long userId);
 
     @Cacheable
-    default User getById(final Long userId){
-        final Optional<User> optionalUser = findById(userId);
+    default UserR getById(final Long userId){
+        final Optional<UserR> optionalUser = findById(userId);
 
         if(optionalUser.isEmpty()){
-            throw new ResourceNotFoundException(User.class, userId);
+            throw new ResourceNotFoundException(UserR.class, userId);
         }
 
         return optionalUser.get();
     }
 
     @Cacheable
-    Optional<User> findByUsername(String username);
+    Optional<UserR> findByUsername(String username);
 
 
 }

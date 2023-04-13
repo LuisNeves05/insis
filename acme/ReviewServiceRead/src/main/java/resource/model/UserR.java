@@ -6,7 +6,7 @@ import java.util.List;
 
 @Entity
 
-public class User {
+public class UserR {
 
     private static final long serialVersionUID = 1L;
 
@@ -20,10 +20,10 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Review> review = new ArrayList<>();
 
-    protected User() {
+    protected UserR() {
     }
 
-    public User(final String username) {
+    public UserR(final String username) {
         this.username = username;
     }
 

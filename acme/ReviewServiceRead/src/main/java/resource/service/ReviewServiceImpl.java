@@ -2,6 +2,7 @@ package resource.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import resource.broker.RabbitMQConfig;
 import resource.controller.ResourceNotFoundException;
 import resource.dto.CreateReviewDTO;
 import resource.dto.ReviewDTO;
@@ -10,6 +11,10 @@ import resource.model.*;
 import resource.repository.ProductRepository;
 import resource.repository.ReviewRepository;
 import resource.repository.UserRepository;
+import resource.service.command_bus.CreateProductCommand;
+import resource.service.command_bus.CreateReviewCommand;
+import resource.service.command_bus.DeleteReviewCommand;
+import resource.service.command_bus.ModerateReviewCommand;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -67,9 +72,8 @@ public class ReviewServiceImpl implements ReviewService {
         // TODO remove null
         Optional<List<Review>> r = repository.findByProductIdStatus(null, status);
 
-        if (r.isEmpty()) return null;
+        return r.map(ReviewMapper::toDtoList).orElse(null);
 
-        return ReviewMapper.toDtoList(r.get());
     }
 
     @Override
@@ -138,11 +142,8 @@ public class ReviewServiceImpl implements ReviewService {
 
         Optional<List<Review>> r = repository.findPendingReviews();
 
-        if (r.isEmpty()) {
-            return null;
-        }
+        return r.map(ReviewMapper::toDtoList).orElse(null);
 
-        return ReviewMapper.toDtoList(r.get());
     }
 
     @Override
@@ -179,5 +180,86 @@ public class ReviewServiceImpl implements ReviewService {
         if (r.isEmpty()) return null;
 
         return ReviewMapper.toDtoList(r.get());
+    }
+
+    public void create(final CreateReviewCommand r) {
+
+        final Optional<Product> product = pRepository.findBySku(r.getProductSku());
+
+        if(product.isEmpty()) return;
+
+        final var user = uRepository.getById(r.getUserID());
+
+        Rating rating = null;
+        Optional<Rating> ra = ratingService.findByRate(r.getRating());
+        if (ra.isPresent()) {
+            rating = ra.get();
+        }
+
+        LocalDate date = LocalDate.now();
+
+        String funfact = "123";
+
+        Review review = new Review(r.getReviewText(), date, product.orElse(null), funfact, rating, user);
+
+       repository.save(review);
+
+    }
+
+    public void moderateReview(ModerateReviewCommand mr) throws ResourceNotFoundException, IllegalArgumentException {
+
+        Optional<Review> r = repository.findById(mr.getReviewId());
+
+        if (r.isEmpty()) {
+            throw new ResourceNotFoundException("Review not found");
+        }
+
+        Boolean ap = r.get().setApprovalStatus(mr.getApproved());
+
+        if (!ap) {
+            throw new IllegalArgumentException("Invalid status value");
+        }
+
+        repository.save(r.get());
+    }
+
+    public void deleteReview(DeleteReviewCommand dr) {
+
+        Optional<Review> rev = repository.findById(dr.reviewId());
+
+        if (rev.isEmpty()) {
+            return;
+        }
+        Review r = rev.get();
+
+        if (r.getUpVote().isEmpty() && r.getDownVote().isEmpty()) {
+            repository.delete(r);
+        }
+    }
+
+
+    public void createProduct(final CreateProductCommand product) {
+        final Product p = new Product(product.getSku(), product.getDesignation(), product.getDescription());
+
+        if(pRepository.findBySku(product.getSku()).orElse(null) == null){
+            pRepository.save(p).toDto();
+        }
+    }
+
+    public void updateProductBySku(CreateProductCommand product) {
+
+        final Optional<Product> productToUpdate = pRepository.findBySku(product.getSku());
+
+        if (productToUpdate.isEmpty()) return;
+
+        productToUpdate.get().updateProduct(new Product(product.getSku(),product.getDesignation(),product.getDescription()));
+
+        pRepository.save(productToUpdate.get());
+    }
+
+    public void deleteProductBySku(CreateProductCommand p) {
+
+        pRepository.findBySku(p.getSku()).ifPresent(pr -> pRepository.deleteBySku(p.getSku()));
+
     }
 }

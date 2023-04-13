@@ -14,7 +14,7 @@ public class CreateProductCommand extends Product implements Serializable {
     private String description;
 
     public CreateProductCommand(String sku, String description, String designation) {
-        super(sku, description, designation);
+        super(sku, designation, description);
         this.sku = sku;
         this.description = description;
         this.designation = designation;

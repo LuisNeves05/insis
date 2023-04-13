@@ -10,6 +10,7 @@ import java.util.List;
 
 public interface ReviewService {
 
+
     ReviewDTO create(CreateReviewDTO createReviewDTO, String sku);
 
     boolean addVoteToReview(Long reviewID, VoteReviewDTO voteReviewDTO);
@@ -19,4 +20,10 @@ public interface ReviewService {
     ReviewDTO moderateReview(Long reviewID, String approved);
 
     void publishReviewMessage(byte[] payload, String routingKey);
+
+    List<ReviewDTO> findReviewsByUser(Long userID);
+
+    List<ReviewDTO> findPendingReview();
+
+    List<ReviewDTO> getReviewsOfProduct(String sku, String status);
 }

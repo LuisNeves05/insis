@@ -2,9 +2,11 @@ package resource.dto;
 
 public class ProductDTO {
     private String sku;
+    private String designation;
 
-    public ProductDTO(String sku) {
+    public ProductDTO(String sku, String designation) {
         this.sku = sku;
+        this.designation = designation;
     }
 
     public String getSku() {
@@ -15,4 +17,11 @@ public class ProductDTO {
         this.sku = sku;
     }
 
+    public String getDesignation() {
+        return designation;
+    }
+
+    public void setDesignation(String designation) {
+        this.designation = designation;
+    }
 }

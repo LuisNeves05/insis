@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import resource.dto.ProductDTO;
 import resource.model.Product;
-import resource.property.RabbitMQConfig;
+import resource.broker.RabbitMQConfig;
 import resource.repository.ProductRepository;
 import resource.service.command_bus.CreateProductCommand;
 
@@ -24,11 +24,12 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductDTO create(final Product product) {
         final Product p = new Product(product.getSku(), product.getDesignation(), product.getDescription());
-
-        // Send the message to the exchange with the routing key
-        publishProductMessage(serializeObject(p), RabbitMQConfig.PRODUCT_CREATE_RK);
-
-        return repository.save(p).toDto();
+        if(repository.findBySku(product.getSku()).orElse(null) == null) {
+            Product product1 = repository.save(p);
+            publishProductMessage(serializeObject(p), RabbitMQConfig.PRODUCT_CREATE_RK);
+            return product1.toDto();
+        }
+        return null;
     }
 
 
@@ -44,7 +45,7 @@ public class ProductServiceImpl implements ProductService {
         Product productUpdated = repository.save(productToUpdate.get());
 
         // Send the message to the exchange with the routing key
-        publishProductMessage(serializeObject(productUpdated), RabbitMQConfig.PRODUCT_UPDATE_RK);
+        publishProductMessage(serializeObject(new CreateProductCommand(productUpdated.getSku(), productUpdated.getDescription(), productUpdated.getDesignation())), RabbitMQConfig.PRODUCT_UPDATE_RK);
 
         return productUpdated.toDto();
     }
@@ -52,10 +53,10 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void deleteBySku(String sku) {
 
-        repository.findBySku(sku).ifPresent(p ->
-                publishProductMessage(serializeObject(p), RabbitMQConfig.PRODUCT_DELETE_RK));
+        repository.findBySku(sku).ifPresent(p -> {
+            repository.deleteBySku(sku);
+            publishProductMessage(serializeObject(p), RabbitMQConfig.PRODUCT_DELETE_RK);});
 
-        repository.deleteBySku(sku);
     }
 
     @Override
@@ -74,7 +75,7 @@ public class ProductServiceImpl implements ProductService {
     public void create(final CreateProductCommand product) {
         final Product p = new Product(product.getSku(), product.getDesignation(), product.getDescription());
 
-        if (repository.findBySku(product.getSku()).isPresent()) {
+        if(repository.findBySku(product.getSku()).orElse(null) == null){
             repository.save(p).toDto();
         }
     }
@@ -85,7 +86,7 @@ public class ProductServiceImpl implements ProductService {
 
         if (productToUpdate.isEmpty()) return;
 
-        productToUpdate.get().updateProduct(product);
+        productToUpdate.get().updateProduct(new Product(product.getSku(),product.getDesignation(),product.getDescription()));
 
         repository.save(productToUpdate.get());
     }
