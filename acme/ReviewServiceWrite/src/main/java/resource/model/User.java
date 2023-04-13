@@ -1,11 +1,13 @@
 package resource.model;
 
+import lombok.Getter;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-
+@Getter
 public class User {
 
     private static final long serialVersionUID = 1L;

@@ -1,6 +1,7 @@
 package resource.service;
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.utils.SerializationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import resource.broker.RabbitMQConfig;
@@ -12,9 +13,9 @@ import resource.model.*;
 import resource.repository.ProductRepository;
 import resource.repository.ReviewRepository;
 import resource.repository.UserRepository;
+import resource.service.command_bus.CreateReviewCommand;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -31,7 +32,6 @@ public class ReviewServiceImpl implements ReviewService {
     @Autowired
     RatingService ratingService;
 
-    // TODO review everything
     @Override
     public ReviewDTO create(final CreateReviewDTO createReviewDTO, String sku) {
 
@@ -55,6 +55,8 @@ public class ReviewServiceImpl implements ReviewService {
 
         review = repository.save(review);
 
+        publishReviewMessage(serializeObject(review), RabbitMQConfig.REVIEW_CREATE_RK);
+
         return ReviewMapper.toDto(review);
     }
 
@@ -70,12 +72,14 @@ public class ReviewServiceImpl implements ReviewService {
             boolean added = review.get().addUpVote(vote);
             if (added) {
                 Review reviewUpdated = this.repository.save(review.get());
+                publishReviewMessage(serializeObject(reviewUpdated), RabbitMQConfig.REVIEW_ADD_UP_VOTE_RK);
                 return reviewUpdated != null;
             }
         } else if (voteReviewDTO.getVote().equalsIgnoreCase("downVote")) {
             boolean added = review.get().addDownVote(vote);
             if (added) {
                 Review reviewUpdated = this.repository.save(review.get());
+                publishReviewMessage(serializeObject(reviewUpdated), RabbitMQConfig.REVIEW_ADD_DOWN_VOTE_RK);
                 return reviewUpdated != null;
             }
         }
@@ -94,6 +98,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         if (r.getUpVote().isEmpty() && r.getDownVote().isEmpty()) {
             repository.delete(r);
+            publishReviewMessage(serializeObject(r), RabbitMQConfig.REVIEW_DELETE_RK);
             return true;
         }
         return false;
@@ -115,15 +120,20 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         Review review = repository.save(r.get());
-
+        publishReviewMessage(serializeObject(review), RabbitMQConfig.REVIEW_MODERATE_RK);
         return ReviewMapper.toDto(review);
     }
 
     @Override
-    public void publishProductMessage(byte[] payload) {
+    public void publishReviewMessage(byte[] payload, String routingKey) {
         this.rabbitMessagingTemplate.convertAndSend(
-                RabbitMQConfig.PRODUCT_EXCHANGE,
-                RabbitMQConfig.PRODUCT_ROUTING_KEY,
+                RabbitMQConfig.EXCHANGE,
+                routingKey,
                 payload);
+    }
+
+    private byte[] serializeObject(Review r) {
+        CreateReviewCommand event = new CreateReviewCommand(r.getReviewText(), r.getUser().getUserId(),r.getRating().getRate());
+        return SerializationUtils.serialize(event);
     }
 }

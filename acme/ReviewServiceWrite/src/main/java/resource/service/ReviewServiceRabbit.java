@@ -117,10 +117,10 @@ public class ReviewServiceRabbit implements ReviewService {
     }
 
     @Override
-    public void publishProductMessage(byte[] payload) {
+    public void publishReviewMessage(byte[] payload, String routingKey) {
         this.rabbitMessagingTemplate.convertAndSend(
-                RabbitMQConfig.PRODUCT_EXCHANGE,
-                RabbitMQConfig.PRODUCT_ROUTING_KEY,
+                RabbitMQConfig.EXCHANGE,
+                routingKey,
                 payload);
     }
 }

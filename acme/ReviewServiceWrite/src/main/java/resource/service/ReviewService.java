@@ -18,5 +18,5 @@ public interface ReviewService {
 
     ReviewDTO moderateReview(Long reviewID, String approved);
 
-    void publishProductMessage(byte[] payload);
+    void publishReviewMessage(byte[] payload, String routingKey);
 }
