@@ -7,7 +7,9 @@ import resource.dto.CreateReviewDTO;
 import resource.dto.ReviewDTO;
 import resource.dto.VoteReviewDTO;
 import resource.model.*;
+import resource.repository.ProductRepository;
 import resource.repository.ReviewRepository;
+import resource.repository.UserRepository;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -18,37 +20,26 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Autowired
     ReviewRepository repository;
-
-    // TODO message broker
-    /*@Autowired
-    ProductRepository pRepository;*/
-    // TODO message broker
-    /*@Autowired
-    UserRepository uRepository;
-    // TODO message broker
     @Autowired
-    UserService userService;*/
-
+    ProductRepository pRepository;
+    @Autowired
+    UserRepository uRepository;
     @Autowired
     RatingService ratingService;
-    // TODO message broker
-    /*@Autowired
-    RestService restService;*/
 
     @Override
     public Iterable<Review> getAll() {
         return repository.findAll();
     }
 
-    // TODO review everything
     @Override
     public ReviewDTO create(final CreateReviewDTO createReviewDTO, String sku) {
 
-        //final Optional<Product> product = pRepository.findBySku(sku);
+        final Optional<Product> product = pRepository.findBySku(sku);
 
-        // if(product.isEmpty()) return null;
+        if(product.isEmpty()) return null;
 
-        //final var user = userService.getUserId(createReviewDTO.getUserID());
+        final var user = uRepository.getById(createReviewDTO.getUserID());
 
         Rating rating = null;
         Optional<Rating> r = ratingService.findByRate(createReviewDTO.getRating());
@@ -58,12 +49,9 @@ public class ReviewServiceImpl implements ReviewService {
 
         LocalDate date = LocalDate.now();
 
-        String funfact = "a";//restService.getFunFact(date);
+        String funfact = "123123";
 
-        if (funfact == null) return null;
-
-        //TODO remove null user and product at the end
-        Review review = new Review(createReviewDTO.getReviewText(), date, null, "", null, null);
+        Review review = new Review(createReviewDTO.getReviewText(), date, product.orElse(null), funfact, rating, user);
 
         review = repository.save(review);
 

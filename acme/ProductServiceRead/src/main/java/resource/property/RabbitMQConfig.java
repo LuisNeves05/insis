@@ -12,10 +12,10 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RabbitMQConfig {
-    public static final String PRODUCT_EXCHANGE = "product-exchange";
-    public static final String PRODUCT_CREATE_RK = "create";
-    public static final String PRODUCT_DELETE_RK = "delete";
-    public static final String PRODUCT_UPDATE_RK = "update";
+    public static final String EXCHANGE = "exchange";
+    public static final String PRODUCT_CREATE_RK = "create-product";
+    public static final String PRODUCT_DELETE_RK = "delete-product";
+    public static final String PRODUCT_UPDATE_RK = "update-product";
 
 
     @Bean
@@ -25,7 +25,7 @@ public class RabbitMQConfig {
 
     @Bean
     DirectExchange exchange() {
-        return new DirectExchange(PRODUCT_EXCHANGE);
+        return new DirectExchange(EXCHANGE);
     }
 
     @Bean

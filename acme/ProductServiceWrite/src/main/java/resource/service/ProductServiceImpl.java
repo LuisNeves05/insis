@@ -61,7 +61,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void publishProductMessage(byte[] payload, String routingKey) {
         this.rabbitMessagingTemplate.convertAndSend(
-                RabbitMQConfig.PRODUCT_EXCHANGE,
+                RabbitMQConfig.EXCHANGE,
                 routingKey,
                 payload);
     }

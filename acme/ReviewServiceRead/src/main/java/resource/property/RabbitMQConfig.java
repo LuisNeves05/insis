@@ -11,7 +11,7 @@ import org.springframework.messaging.handler.annotation.support.DefaultMessageHa
 
 @Configuration
 public class RabbitMQConfig {
-    public static final String REVIEW_EXCHANGE = "review-exchange";
+    public static final String REVIEW_EXCHANGE = "exchange";
     public static final String REVIEW_QUEUE = "review-queue";
     public static final String REVIEW_ROUTING_KEY = "review-routing-key";
 

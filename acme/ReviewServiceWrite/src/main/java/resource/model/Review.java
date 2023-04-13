@@ -1,6 +1,8 @@
 package resource.model;
 
 
+import lombok.Getter;
+
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -8,6 +10,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
+@Getter
 public class Review {
 
     @Id
@@ -24,14 +27,14 @@ public class Review {
     private String reviewText;
 
     @ElementCollection
-    @Column(nullable = true)
+    @Column()
     private List<Vote> upVote;
 
     @ElementCollection
-    @Column(nullable = true)
+    @Column()
     private List<Vote> downVote;
 
-    @Column(nullable = true)
+    @Column()
     private String report;
 
     @Column(nullable = false)
