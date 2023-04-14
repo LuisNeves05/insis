@@ -11,7 +11,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Service;
 import resource.broker.RabbitMQConfig;
+import resource.model.UserR;
 import resource.repository.ReviewRepository;
+import resource.repository.UserRepository;
 import resource.service.command_bus.CreateProductCommand;
 import resource.service.command_bus.CreateReviewCommand;
 import resource.service.command_bus.DeleteReviewCommand;
@@ -25,6 +27,9 @@ public class ReviewServiceRabbit {
 
     @Autowired
     private ReviewRepository repository;
+
+    @Autowired
+    private UserRepository urepository;
 
     @Bean
     public MessageConverter jsonMessageConverter(ObjectMapper objectMapper) {

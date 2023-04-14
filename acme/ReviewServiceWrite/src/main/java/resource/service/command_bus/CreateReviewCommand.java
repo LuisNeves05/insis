@@ -11,7 +11,6 @@ public class CreateReviewCommand implements Serializable {
     private String reviewText;
     private Long userID;
     private Double rating;
-
     private String productSku;
 
     public CreateReviewCommand(String reviewText, Long userID, Double rating, String productSku) {

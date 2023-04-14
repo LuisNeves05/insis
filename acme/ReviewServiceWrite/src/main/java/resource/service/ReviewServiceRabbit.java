@@ -12,9 +12,11 @@ import org.springframework.stereotype.Service;
 import resource.broker.RabbitMQConfig;
 import resource.dto.ProductDTO;
 import resource.model.Product;
+import resource.model.UserR;
 import resource.repository.ProductRepository;
 import org.springframework.messaging.handler.annotation.Header;
 import resource.repository.ReviewRepository;
+import resource.repository.UserRepository;
 import resource.service.command_bus.CreateProductCommand;
 import resource.service.command_bus.CreateReviewCommand;
 import resource.service.command_bus.DeleteReviewCommand;
@@ -29,7 +31,7 @@ public class ReviewServiceRabbit {
     private ReviewServiceImpl service;
 
     @Autowired
-    private ReviewRepository repository;
+    private UserRepository urepository;
 
     @Bean
     public MessageConverter jsonMessageConverter(ObjectMapper objectMapper) {
@@ -80,6 +82,5 @@ public class ReviewServiceRabbit {
             }
         }
     }
-
 
 }
