@@ -22,8 +22,6 @@ builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("Mo
 builder.Services.AddSingleton<IVoteServices, VoteService>();
 builder.Services.AddSingleton<IVotesRepository, VotesRepository>();
 
-builder.Services.AddSingleton<IVoteRabbitServices, VoteServiceRabbit>();
-
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -62,20 +60,61 @@ channel.QueueBind(queue: queueName,
     exchange: Constants.exchangeName,
     routingKey: Constants.voteUpdateRk);
 
+static IServiceCollection ConfigureServices()
+{
+    var services = new ServiceCollection();
+
+    services.AddSingleton<IVoteRabbitServices, VoteServiceRabbit>();
+    services.AddSingleton<Program>();
+
+    return services;
+}
+
+static T Configure<T>(T service)
+{
+    // perform additional configuration if needed
+    return service;
+}
+
+var services = ConfigureServices(); // configure services
+var serviceProvider = services.BuildServiceProvider(); // build service provider
 var consumer = new EventingBasicConsumer(channel);
-consumer.Received += (model, ea) =>
+consumer.Received += async (model, ea) =>
 {
     var body = ea.Body.ToArray();
     var routingKey = ea.RoutingKey;
-    VoteServiceRabbit p = new VoteServiceRabbit();
-
-    p.DistributeViaRoutingKey(routingKey, body);
+    using var stream = new MemoryStream(body);
+    var serializer = new DataContractSerializer(typeof(CreateVoteEvent));
+    var newEvent = serializer.ReadObject(stream) as CreateVoteEvent;
+    Console.WriteLine("AQUI AQUI 1");
+    switch (routingKey)
+    {
+        case Constants.voteCreateRk:
+            Console.WriteLine("AQUI AQUI 2");
+            var saveService = serviceProvider.GetRequiredService<IVoteRabbitServices>();
+            await Configure(saveService).CreateVote(newEvent);
+            break;
+        case Constants.voteUpdateRk:
+            var updateService = serviceProvider.GetRequiredService<IVoteRabbitServices>();
+            // await Configure(updateService).UpdateAsync(newEvent);
+            break;
+        case Constants.voteDeleteRk:
+            var deleteService = serviceProvider.GetRequiredService<IVoteRabbitServices>();
+            // await Configure(deleteService).DeleteAsync(newEvent);
+            break;
+        default:
+            Console.WriteLine($"Unknown routing key: {routingKey}");
+            break;
+    }
 };
+
 channel.BasicConsume(queue: "",
     autoAck: true,
     consumer: consumer);
 
+
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

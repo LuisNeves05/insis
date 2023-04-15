@@ -1,4 +1,6 @@
+using System.Text.Json;
 using Microsoft.VisualBasic.CompilerServices;
+using VotesWrite.broker;
 using VotesWrite.Dtos.Create;
 using VotesWrite.Dtos.Events;
 using VotesWrite.Dtos.Response;
@@ -29,8 +31,8 @@ public class VoteService : IVoteServices
 
             var result = await _voteRepository.Add(newVote);
             if (result is null) throw new ArgumentException();
-
-
+            var messageBody = JsonSerializer.SerializeToUtf8Bytes(result);
+            RabitMQProducer.PublishMessage(messageBody, Constants.BrokerConstants.voteCreateRk);
             return new HephaestusResponse<VoteResponse>().SetSucess(Utils.Utils.toDto(result), 1);
         }
         catch (Exception ex)
@@ -50,37 +52,9 @@ public class VoteService : IVoteServices
             var result = await _voteRepository.Get(id);
 
             if (result != null) throw new ArgumentException();
+            var messageBody = JsonSerializer.SerializeToUtf8Bytes(result);
+            RabitMQProducer.PublishMessage(messageBody, Constants.BrokerConstants.voteDeleteRk);
             return new HephaestusResponse<VoteResponse>().SetSucess();
-        }
-        catch (Exception ex)
-        {
-            return new HephaestusResponse<VoteResponse>().SetFail(ex);
-        }
-    }
-
-    public async Task<HephaestusResponse<List<VoteResponse>>> GetAllVotes()
-    {
-        try
-        {
-            var result = await _voteRepository.GetAll();
-            if (result is null) throw new ArgumentException();
-
-            return new HephaestusResponse<List<VoteResponse>>().SetSucess(Utils.Utils.toDto(result), result.Count);
-        }
-        catch (Exception ex)
-        {
-            return new HephaestusResponse<List<VoteResponse>>().SetFail(ex);
-        }
-    }
-
-    public async Task<HephaestusResponse<VoteResponse>> GetVote(Guid id)
-    {
-        try
-        {
-            var result = await _voteRepository.Get(id);
-            if (result is null) throw new ArgumentException();
-
-            return new HephaestusResponse<VoteResponse>().SetSucess(Utils.Utils.toDto(result), 1);
         }
         catch (Exception ex)
         {
@@ -103,6 +77,8 @@ public class VoteService : IVoteServices
 
             var result = await _voteRepository.Get(id);
             if (result is null) throw new ArgumentException();
+            var messageBody = JsonSerializer.SerializeToUtf8Bytes(result);
+            RabitMQProducer.PublishMessage(messageBody, Constants.BrokerConstants.voteUpdateRk);
 
             return new HephaestusResponse<VoteResponse>().SetSucess(Utils.Utils.toDto(result), 1);
         }

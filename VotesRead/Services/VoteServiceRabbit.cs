@@ -1,11 +1,14 @@
-﻿using VotesWrite.Dtos.Events;
-using VotesWrite.Dtos.Response;
-using VotesWrite.Entities;
-using VotesWrite.Interfaces.RepositoryInterfaces;
-using VotesWrite.Interfaces.ServiceInterfaces;
-using Constants = VotesWrite.Constants.BrokerConstants;
+﻿using System.Runtime.Serialization;
+using System.Text;
+using RabbitMQ.Client.Events;
+using VotesRead.Dtos.Events;
+using VotesRead.Dtos.Response;
+using VotesRead.Entities;
+using VotesRead.Interfaces.RepositoryInterfaces;
+using VotesRead.Interfaces.ServiceInterfaces;
+using Constants = VotesRead.Constants.BrokerConstants;
 
-namespace VotesWrite.Services;
+namespace VotesRead.Services;
 
 public class VoteServiceRabbit : IVoteRabbitServices
 {
