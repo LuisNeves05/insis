@@ -2,6 +2,7 @@ package resource.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import resource.broker.RabbitMQConfig;
 import resource.controller.ResourceNotFoundException;
 import resource.dto.CreateReviewDTO;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class ReviewServiceImpl implements ReviewService {
 
     @Autowired
@@ -42,7 +44,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         final Optional<Product> product = pRepository.findBySku(sku);
 
-        if(product.isEmpty()) return null;
+        if (product.isEmpty()) return null;
 
         final var user = uRepository.getById(createReviewDTO.getUserID());
 
@@ -185,9 +187,7 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public void create(final CreateReviewCommand r) {
 
-        final Optional<Product> product = pRepository.findBySku(r.getProductSku());
-
-        if(product.isEmpty()) return;
+        final Product product = pRepository.findBySku(r.getProductSku()).orElse(null);
 
         final var user = uRepository.getById(r.getUserID());
 
@@ -197,13 +197,17 @@ public class ReviewServiceImpl implements ReviewService {
             rating = ra.get();
         }
 
-        LocalDate date = LocalDate.now();
+        assert product != null;
+        if (repository.findByProductIdAndUserId(product, user).isEmpty()) {
 
-        String funfact = "123";
+            LocalDate date = LocalDate.now();
 
-        Review review = new Review(r.getReviewText(), date, product.orElse(null), funfact, rating, user);
+            String funfact = "123";
 
-       repository.save(review);
+            Review review = new Review(r.getReviewText(), date, product, funfact, rating, user);
+
+            repository.save(review);
+        }
 
     }
     @Override

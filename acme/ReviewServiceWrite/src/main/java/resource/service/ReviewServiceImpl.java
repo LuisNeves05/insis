@@ -4,6 +4,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.utils.SerializationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import resource.broker.RabbitMQConfig;
 import resource.controller.ResourceNotFoundException;
 import resource.dto.CreateReviewDTO;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class ReviewServiceImpl implements ReviewService {
 
     @Autowired
@@ -37,47 +39,12 @@ public class ReviewServiceImpl implements ReviewService {
     RatingService ratingService;
 
 
-
-    @Override
-    public List<ReviewDTO> findReviewsByUser(Long userID) {
-
-        final Optional<UserR> user = uRepository.findById(userID);
-
-        if(user.isEmpty()) return null;
-
-        Optional<List<Review>> r = repository.findByUserId(user.get());
-
-        return r.map(ReviewMapper::toDtoList).orElse(null);
-
-    }
-
-    @Override
-    public List<ReviewDTO> getReviewsOfProduct(String sku, String status) {
-
-        Optional<Product> product = pRepository.findBySku(sku);
-        if( product.isEmpty() ) return null;
-
-        Optional<List<Review>> r = repository.findByProductIdStatus(product.get(), status);
-
-        return r.map(ReviewMapper::toDtoList).orElse(null);
-
-    }
-
-    @Override
-    public List<ReviewDTO> findPendingReview(){
-
-        Optional<List<Review>> r = repository.findPendingReviews();
-
-        return r.map(ReviewMapper::toDtoList).orElse(null);
-
-    }
-
     @Override
     public ReviewDTO create(final CreateReviewDTO createReviewDTO, String sku) {
 
         final Optional<Product> product = pRepository.findBySku(sku);
 
-         if(product.isEmpty()) return null;
+        if (product.isEmpty()) return null;
 
         final var user = uRepository.getById(createReviewDTO.getUserID());
 
@@ -95,7 +62,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         review = repository.save(review);
 
-        publishReviewMessage(serializeObject(review), RabbitMQConfig.REVIEW_CREATE_RK);
+        publishReviewMessage(serializeCreateObject(review), RabbitMQConfig.REVIEW_CREATE_RK);
 
         return ReviewMapper.toDto(review);
     }
@@ -112,14 +79,14 @@ public class ReviewServiceImpl implements ReviewService {
             boolean added = review.get().addUpVote(vote);
             if (added) {
                 Review reviewUpdated = this.repository.save(review.get());
-                publishReviewMessage(serializeObject(reviewUpdated), RabbitMQConfig.REVIEW_ADD_UP_VOTE_RK);
+                publishReviewMessage(serializeCreateObject(reviewUpdated), RabbitMQConfig.REVIEW_ADD_UP_VOTE_RK);
                 return reviewUpdated != null;
             }
         } else if (voteReviewDTO.getVote().equalsIgnoreCase("downVote")) {
             boolean added = review.get().addDownVote(vote);
             if (added) {
                 Review reviewUpdated = this.repository.save(review.get());
-                publishReviewMessage(serializeObject(reviewUpdated), RabbitMQConfig.REVIEW_ADD_DOWN_VOTE_RK);
+                publishReviewMessage(serializeCreateObject(reviewUpdated), RabbitMQConfig.REVIEW_ADD_DOWN_VOTE_RK);
                 return reviewUpdated != null;
             }
         }
@@ -138,7 +105,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         if (r.getUpVote().isEmpty() && r.getDownVote().isEmpty()) {
             repository.delete(r);
-            publishReviewMessage(serializeObject(r), RabbitMQConfig.REVIEW_DELETE_RK);
+            publishReviewMessage(serializeDeleteObject(r), RabbitMQConfig.REVIEW_DELETE_RK);
             return true;
         }
         return false;
@@ -160,7 +127,8 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         Review review = repository.save(r.get());
-        publishReviewMessage(serializeObject(review), RabbitMQConfig.REVIEW_MODERATE_RK);
+        ModerateReviewCommand mrc = new ModerateReviewCommand(review.getIdReview(), review.getApprovalStatus());
+        publishReviewMessage(serializeModerateObject(mrc), RabbitMQConfig.REVIEW_MODERATE_RK);
         return ReviewMapper.toDto(review);
     }
 
@@ -172,17 +140,24 @@ public class ReviewServiceImpl implements ReviewService {
                 payload);
     }
 
-    private byte[] serializeObject(Review r) {
-        CreateReviewCommand event = new CreateReviewCommand(r.getReviewText(), r.getUser().getUserId(),r.getRating().getRate(), r.getProduct().getSku());
+    private byte[] serializeCreateObject(Review r) {
+        CreateReviewCommand event = new CreateReviewCommand(r.getReviewText(), r.getUser().getUserId(), r.getRating().getRate(), r.getProduct().getSku());
         return SerializationUtils.serialize(event);
+    }
+
+    private byte[] serializeDeleteObject(Review r) {
+        DeleteReviewCommand event = new DeleteReviewCommand(r.getIdReview());
+        return SerializationUtils.serialize(event);
+    }
+
+    private byte[] serializeModerateObject(ModerateReviewCommand r) {
+        return SerializationUtils.serialize(r);
     }
 
     @Override
     public void create(final CreateReviewCommand r) {
 
-        final Optional<Product> product = pRepository.findBySku(r.getProductSku());
-
-        if(product.isEmpty()) return;
+        final Product product = pRepository.findBySku(r.getProductSku()).orElse(null);
 
         final var user = uRepository.getById(r.getUserID());
 
@@ -192,33 +167,33 @@ public class ReviewServiceImpl implements ReviewService {
             rating = ra.get();
         }
 
-        LocalDate date = LocalDate.now();
+        assert product != null;
+        if (repository.findByProductIdAndUserId(product, user).isEmpty()) {
 
-        String funfact = "123";
+            LocalDate date = LocalDate.now();
 
-        Review review = new Review(r.getReviewText(), date, product.orElse(null), funfact, rating, user);
+            String funfact = "123";
 
-        review = repository.save(review);
+            Review review = new Review(r.getReviewText(), date, product, funfact, rating, user);
 
-        publishReviewMessage(serializeObject(review), RabbitMQConfig.REVIEW_CREATE_RK);
+            repository.save(review);
+        }
     }
 
-    @Override
     public void moderateReview(ModerateReviewCommand mr) throws ResourceNotFoundException, IllegalArgumentException {
 
-        Optional<Review> r = repository.findById(mr.getReviewId());
+        Review r = repository.findById(mr.getReviewId()).orElse(null);
 
-        if (r.isEmpty()) {
-            throw new ResourceNotFoundException("Review not found");
+        assert r != null;
+        if (!r.getApprovalStatus().equals(mr.getApproved())) {
+            Boolean ap = r.setApprovalStatus(mr.getApproved());
+
+            if (!ap) {
+                throw new IllegalArgumentException("Invalid status value");
+            }
+
+            repository.save(r);
         }
-
-        Boolean ap = r.get().setApprovalStatus(mr.getApproved());
-
-        if (!ap) {
-            throw new IllegalArgumentException("Invalid status value");
-        }
-
-        repository.save(r.get());
     }
 
     @Override

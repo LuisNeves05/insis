@@ -2,6 +2,7 @@ package resource.repository;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import resource.model.Product;
 import resource.model.Review;
 import resource.model.UserR;
@@ -16,6 +17,9 @@ public interface ReviewRepository extends CrudRepository<Review, Long> {
 
     @Query("SELECT r FROM Review r WHERE r.product=:product ORDER BY r.publishingDate DESC")
     Optional<List<Review>> findByProductId(Product product);
+
+    @Query("SELECT r FROM Review r WHERE r.product=:product and r.user=:user ORDER BY r.publishingDate DESC")
+    Optional<List<Review>> findByProductIdAndUserId(@Param("product")Product product, @Param("user")UserR user);
 
 
     @Query("SELECT r FROM Review r WHERE r.approvalStatus='pending'")
