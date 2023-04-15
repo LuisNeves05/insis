@@ -1,11 +1,9 @@
-﻿using System.Runtime.Serialization;
-using System.Text;
-using RabbitMQ.Client.Events;
-using VotesRead.Dtos.Events;
+﻿
 using VotesRead.Dtos.Response;
 using VotesRead.Entities;
 using VotesRead.Interfaces.RepositoryInterfaces;
 using VotesRead.Interfaces.ServiceInterfaces;
+using VotesWrite.Dtos.Events;
 using Constants = VotesRead.Constants.BrokerConstants;
 
 namespace VotesRead.Services;
@@ -22,6 +20,7 @@ public class VoteServiceRabbit : IVoteRabbitServices
     public async Task<HephaestusResponse<VoteResponse>> CreateVote(CreateVoteEvent? voteEvent)
     {
         Console.WriteLine("ENTROU AQUI AAAEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
+
         Vote newVote = new()
         {
             Type = voteEvent?.Type,

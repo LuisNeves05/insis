@@ -29,7 +29,7 @@ public class VotesController : ControllerBase
         var data = await _voteServices.DeleteVote(id);
         return data.Data is null ? StatusCode(500) : Ok(data);
     }
-    [HttpPost]
+    [HttpPut]
     public async Task<ActionResult<HephaestusResponse<VoteResponse>>> UpdateVote(Guid id, CreateVoteDto voteDto)
     {
         var data = await _voteServices.UpdateVote(id, voteDto);

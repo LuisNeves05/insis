@@ -31,7 +31,8 @@ public class VoteService : IVoteServices
 
             var result = await _voteRepository.Add(newVote);
             if (result is null) throw new ArgumentException();
-            var messageBody = JsonSerializer.SerializeToUtf8Bytes(result);
+            CreateVoteEvent createVoteEvent = new CreateVoteEvent(result.Id.ToString(), result.Type, result.UserId);
+            var messageBody = JsonSerializer.SerializeToUtf8Bytes(createVoteEvent);
             RabitMQProducer.PublishMessage(messageBody, Constants.BrokerConstants.voteCreateRk);
             return new HephaestusResponse<VoteResponse>().SetSucess(Utils.Utils.toDto(result), 1);
         }
@@ -86,18 +87,5 @@ public class VoteService : IVoteServices
         {
             return new HephaestusResponse<VoteResponse>().SetFail(ex);
         }
-    }
-
-
-    public async void CreateRabbitVote(CreateVoteEvent voteDto)
-    {
-        Vote newVote = new()
-        {
-            Type = voteDto.Type,
-            UserId = voteDto.UserId
-        };
-
-        var result = await _voteRepository.Add(newVote);
-        if (result is null) throw new ArgumentException();
     }
 }

@@ -8,15 +8,22 @@ namespace VotesWrite.Dtos.Events;
 public class CreateVoteEvent
 {
    
+    public string id { get; }
+    
     [DataMember]
     public string? Type { get; }
     
     [DataMember]
     public long UserId { get; }
 
-    public CreateVoteEvent(string? type, long userId)
+    public CreateVoteEvent(string id, string? type, long userId)
     {
+        this.id = id;
         Type = type;
         UserId = userId;
+    }
+
+    public CreateVoteEvent()
+    {
     }
 }

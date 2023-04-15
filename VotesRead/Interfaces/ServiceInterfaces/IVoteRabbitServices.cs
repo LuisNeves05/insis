@@ -1,6 +1,6 @@
-﻿using VotesRead.Dtos.Events;
-using VotesRead.Dtos.Response;
+﻿using VotesRead.Dtos.Response;
 using VotesRead.Entities;
+using VotesWrite.Dtos.Events;
 
 
 namespace VotesRead.Interfaces.ServiceInterfaces;

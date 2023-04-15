@@ -1,10 +1,8 @@
-using Microsoft.VisualBasic.CompilerServices;
-using VotesRead.Dtos.Create;
-using VotesRead.Dtos.Events;
 using VotesRead.Dtos.Response;
 using VotesRead.Entities;
 using VotesRead.Interfaces.RepositoryInterfaces;
 using VotesRead.Interfaces.ServiceInterfaces;
+using VotesWrite.Dtos.Events;
 
 namespace VotesRead.Services;
 
