@@ -23,13 +23,7 @@ public interface ReviewService {
     ReviewDTO moderateReview(Long reviewID, String approved);
 
     void publishReviewMessage(byte[] payload, String routingKey);
-
-    List<ReviewDTO> findReviewsByUser(Long userID);
-
-    List<ReviewDTO> findPendingReview();
-
-    List<ReviewDTO> getReviewsOfProduct(String sku, String status);
-
+    
     void deleteReview(DeleteReviewCommand dr);
 
     void moderateReview(ModerateReviewCommand mr);
