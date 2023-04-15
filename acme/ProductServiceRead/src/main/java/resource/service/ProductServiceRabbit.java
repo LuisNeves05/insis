@@ -28,7 +28,7 @@ public class ProductServiceRabbit {
     }
 
     @RabbitListener(queues = "#{queue_main.name}")
-    public void receiveMessageAndDistribute(byte[] messageBytes, @Header("amqp_receivedRoutingKey") String routingKey) throws JsonProcessingException {
+    public void receiveMessageAndDistribute(byte[] messageBytes, @Header("amqp_receivedRoutingKey") String routingKey) {
 
         System.out.println("#############################################");
         System.out.println("Received Message");

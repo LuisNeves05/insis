@@ -23,7 +23,7 @@ public interface ReviewService {
     ReviewDTO moderateReview(Long reviewID, String approved);
 
     void publishReviewMessage(byte[] payload, String routingKey);
-    
+
     void deleteReview(DeleteReviewCommand dr);
 
     void moderateReview(ModerateReviewCommand mr);

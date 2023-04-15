@@ -25,9 +25,9 @@ public class ProductServiceImpl implements ProductService {
     public ProductDTO create(final Product product) {
         final Product p = new Product(product.getSku(), product.getDesignation(), product.getDescription());
         if(repository.findBySku(product.getSku()).orElse(null) == null) {
-            Product product1 = repository.save(p);
-            publishProductMessage(serializeObject(p), RabbitMQConfig.PRODUCT_CREATE_RK);
-            return product1.toDto();
+            Product productUpdated = repository.save(p);
+            publishProductMessage(serializeObject(new CreateProductCommand(productUpdated.getSku(), productUpdated.getDescription(), productUpdated.getDesignation())), RabbitMQConfig.PRODUCT_CREATE_RK);
+            return productUpdated.toDto();
         }
         return null;
     }

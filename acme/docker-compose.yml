@@ -96,6 +96,7 @@ services:
       - postgres-review-r
       - postgres-product-w
       - postgres-review-w
+      - postgres-bootstrap
 
     restart: unless-stopped
 
@@ -107,6 +108,8 @@ networks:
   postgres-product-r:
     driver: bridge
   postgres-review-r:
+    driver: bridge
+  postgres-bootstrap:
     driver: bridge
 
 volumes:
