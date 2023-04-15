@@ -2,15 +2,15 @@ package resource.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import resource.dto.ProductDTO;
-import resource.model.Product;
 import resource.service.ProductService;
 
 import java.util.Optional;
@@ -27,9 +27,9 @@ class ProductController {
     @Operation(summary = "gets catalog, i.e. all products")
     @GetMapping
     public ResponseEntity<Iterable<ProductDTO>> getCatalog() {
-       final var products = service.getCatalog();
+        final var products = service.getCatalog();
 
-       return ResponseEntity.ok().body( products );
+        return ResponseEntity.ok().body( products );
     }
 
     @Operation(summary = "finds product by sku")
@@ -49,7 +49,7 @@ class ProductController {
     public ResponseEntity<Iterable<ProductDTO>> findAllByDesignation(@PathVariable("designation") final String designation){
 
         final Iterable<ProductDTO> products = service.findByDesignation( designation );
-        
+
         return ResponseEntity.ok().body( products );
     }
 }

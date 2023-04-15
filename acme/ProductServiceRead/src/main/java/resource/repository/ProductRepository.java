@@ -32,4 +32,3 @@ public interface ProductRepository extends CrudRepository<Product, Long> {
     @Query("DELETE FROM Product p WHERE p.sku=:sku")
     void deleteBySku(@Param("sku") String sku);
 }
-

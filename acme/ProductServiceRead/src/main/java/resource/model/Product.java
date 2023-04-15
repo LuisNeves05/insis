@@ -2,8 +2,9 @@ package resource.model;
 
 import resource.dto.ProductDTO;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
 import java.util.Objects;
+import javax.persistence.*;
 
 @Entity
 public class Product {
