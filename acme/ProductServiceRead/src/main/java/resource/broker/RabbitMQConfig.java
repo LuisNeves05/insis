@@ -1,6 +1,5 @@
-package resource.property;
+package resource.broker;
 
-import com.rabbitmq.client.Channel;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -16,7 +15,7 @@ public class RabbitMQConfig {
     public static final String PRODUCT_CREATE_RK = "create-product";
     public static final String PRODUCT_DELETE_RK = "delete-product";
     public static final String PRODUCT_UPDATE_RK = "update-product";
-
+    public static final String BOOTSTRAP_PRODUCT = "bootstrap-product";
 
     @Bean
     Queue queue_main() {

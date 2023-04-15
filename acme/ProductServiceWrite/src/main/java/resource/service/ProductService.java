@@ -13,4 +13,10 @@ public interface ProductService {
     ProductDTO updateBySku(final String sku, final Product product);
 
     void deleteBySku(final String sku);
+
+    void create(final CreateProductCommand product);
+
+    void updateBySku(CreateProductCommand product);
+
+    void deleteBySku(CreateProductCommand p);
 }

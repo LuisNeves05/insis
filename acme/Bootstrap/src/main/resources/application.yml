@@ -1,0 +1,28 @@
+server:
+  port: 8081
+spring:
+  application:
+    name: Bootstrap
+  rabbitmq:
+    host: localhost
+    username: guest
+    password: guest
+    port: 5672
+  datasource:
+    password: password
+    url: jdbc:postgresql://localhost:5436/bootstrap-db
+    username: root
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: true
+file:
+  uploadDir: DEV/FileUploads
+
+
+
+

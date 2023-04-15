@@ -5,6 +5,9 @@ import resource.dto.ReviewDTO;
 import resource.dto.VoteReviewDTO;
 import resource.model.Product;
 import resource.model.Review;
+import resource.service.command_bus.CreateReviewCommand;
+import resource.service.command_bus.DeleteReviewCommand;
+import resource.service.command_bus.ModerateReviewCommand;
 
 import java.util.List;
 
@@ -27,4 +30,10 @@ public interface ReviewService {
     ReviewDTO moderateReview(Long reviewID, String approved);
 
     List<ReviewDTO> findReviewsByUser(Long userID);
+
+    void deleteReview(DeleteReviewCommand dr);
+
+    void moderateReview(ModerateReviewCommand mr);
+
+    void create(final CreateReviewCommand r);
 }

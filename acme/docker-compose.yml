@@ -1,5 +1,22 @@
 services:
 
+  ##BOOTSTRAP
+  postgres-bootstrap:
+    container_name: Bootstrap-db
+    image: postgres
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: bootstrap-db
+      PGDATA: /data/postgresBootstrap
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - "5436:5432"
+    networks:
+      - postgres-bootstrap
+    restart: unless-stopped
+
   ##PRODUCT WRITE
   postgres-product-w:
     container_name: Product-db-w

@@ -1,26 +1,23 @@
 package resource.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.amqp.rabbit.annotation.*;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.converter.DefaultClassMapper;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.amqp.utils.SerializationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Service;
-import resource.model.Product;
-import resource.property.RabbitMQConfig;
-import resource.repository.ProductRepository;
-import resource.service.command_bus.CreateProductCommand;
 import org.springframework.messaging.handler.annotation.Header;
+import org.springframework.stereotype.Service;
+import resource.broker.RabbitMQConfig;
+import resource.service.command_bus.CreateProductCommand;
 
 @Service
 public class ProductServiceRabbit {
     @Autowired
-    private ProductRepository repository;
-    @Autowired
-    private ProductServiceImpl service;
+    private ProductService service;
 
     @Bean
     public MessageConverter jsonMessageConverter(ObjectMapper objectMapper) {
@@ -31,7 +28,7 @@ public class ProductServiceRabbit {
     }
 
     @RabbitListener(queues = "#{queue_main.name}")
-    public void receiveMessageAndDistribute(byte[] messageBytes, @Header("amqp_receivedRoutingKey") String routingKey) {
+    public void receiveMessageAndDistribute(byte[] messageBytes, @Header("amqp_receivedRoutingKey") String routingKey) throws JsonProcessingException {
 
         System.out.println("#############################################");
         System.out.println("Received Message");

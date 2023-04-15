@@ -182,6 +182,7 @@ public class ReviewServiceImpl implements ReviewService {
         return ReviewMapper.toDtoList(r.get());
     }
 
+    @Override
     public void create(final CreateReviewCommand r) {
 
         final Optional<Product> product = pRepository.findBySku(r.getProductSku());
@@ -205,7 +206,7 @@ public class ReviewServiceImpl implements ReviewService {
        repository.save(review);
 
     }
-
+    @Override
     public void moderateReview(ModerateReviewCommand mr) throws ResourceNotFoundException, IllegalArgumentException {
 
         Optional<Review> r = repository.findById(mr.getReviewId());
@@ -222,7 +223,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         repository.save(r.get());
     }
-
+    @Override
     public void deleteReview(DeleteReviewCommand dr) {
 
         Optional<Review> rev = repository.findById(dr.reviewId());
@@ -235,31 +236,5 @@ public class ReviewServiceImpl implements ReviewService {
         if (r.getUpVote().isEmpty() && r.getDownVote().isEmpty()) {
             repository.delete(r);
         }
-    }
-
-
-    public void createProduct(final CreateProductCommand product) {
-        final Product p = new Product(product.getSku(), product.getDesignation(), product.getDescription());
-
-        if(pRepository.findBySku(product.getSku()).orElse(null) == null){
-            pRepository.save(p).toDto();
-        }
-    }
-
-    public void updateProductBySku(CreateProductCommand product) {
-
-        final Optional<Product> productToUpdate = pRepository.findBySku(product.getSku());
-
-        if (productToUpdate.isEmpty()) return;
-
-        productToUpdate.get().updateProduct(new Product(product.getSku(),product.getDesignation(),product.getDescription()));
-
-        pRepository.save(productToUpdate.get());
-    }
-
-    public void deleteProductBySku(CreateProductCommand p) {
-
-        pRepository.findBySku(p.getSku()).ifPresent(pr -> pRepository.deleteBySku(p.getSku()));
-
     }
 }

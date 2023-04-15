@@ -14,6 +14,7 @@
         <module>ProductServiceRead</module>
         <module>ReviewServiceRead</module>
         <module>ReviewServiceWrite</module>
+        <module>Bootstrap</module>
     </modules>
 
     <name>ACME</name>

@@ -21,10 +21,10 @@ import resource.service.command_bus.ModerateReviewCommand;
 public class ReviewServiceRabbit {
 
     @Autowired
-    private ReviewServiceImpl service;
+    private ReviewService service;
 
     @Autowired
-    private ReviewRepository repository;
+    private ProductService productService;
 
     @Bean
     public MessageConverter jsonMessageConverter(ObjectMapper objectMapper) {
@@ -63,15 +63,15 @@ public class ReviewServiceRabbit {
             }
             case RabbitMQConfig.PRODUCT_CREATE_RK -> {
                 CreateProductCommand event = (CreateProductCommand) SerializationUtils.deserialize(messageBytes);
-                service.createProduct(event);
+                productService.create(event);
             }
             case RabbitMQConfig.PRODUCT_DELETE_RK -> {
                 CreateProductCommand event = (CreateProductCommand) SerializationUtils.deserialize(messageBytes);
-                service.deleteProductBySku(event);
+                productService.deleteBySku(event);
             }
             case RabbitMQConfig.PRODUCT_UPDATE_RK -> {
                 CreateProductCommand event = (CreateProductCommand) SerializationUtils.deserialize(messageBytes);
-                service.updateProductBySku(event);
+                productService.updateBySku(event);
             }
         }
     }
