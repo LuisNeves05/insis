@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import resource.broker.RabbitMQConfig;
-import resource.repository.ProductRepository;
 import resource.service.command_bus.CreateProductCommand;
 import org.springframework.messaging.handler.annotation.Header;
 
@@ -19,9 +18,6 @@ public class ProductServiceRabbit {
 
     @Autowired
     private ProductServiceImpl service;
-
-    @Autowired
-    private ProductRepository repository;
 
     @Bean
     public MessageConverter jsonMessageConverter(ObjectMapper objectMapper) {
