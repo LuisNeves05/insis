@@ -1,0 +1,12 @@
+services:
+  
+  votes-write-application-1:
+    build: .
+    ports:
+      - "8087:8087"
+  
+  votes-write-application-2:
+    build: .
+    ports:
+      - "8088:8087"
+  

@@ -15,7 +15,7 @@ public sealed class RabbitMQConnection
     {
         var factory = new ConnectionFactory
         {
-            HostName = "localhost",
+            HostName = "192.168.1.94",
             UserName = "guest",
             Password = "guest",
             Port = 5672,
