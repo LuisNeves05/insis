@@ -2,7 +2,6 @@ using System.Text.Json;
 using Microsoft.VisualBasic.CompilerServices;
 using VotesWrite.broker;
 using VotesWrite.Dtos.Create;
-using VotesWrite.Dtos.Events;
 using VotesWrite.Dtos.Response;
 using VotesWrite.Entities;
 using VotesWrite.Interfaces.RepositoryInterfaces;
@@ -33,7 +32,7 @@ public class VoteService : IVoteServices
             var result = await _voteRepository.Add(newVote);
 
             if (result is null) throw new ArgumentException();
-            CreateVoteEvent createVoteEvent = new CreateVoteEvent(result.Id.ToString(), result.Type, result.UserId);
+            CreateVoteEvent createVoteEvent = new CreateVoteEvent(result.Id, result.Type, result.UserId, result.ReviewId);
             
             var messageBody = JsonSerializer.SerializeToUtf8Bytes(createVoteEvent);
 

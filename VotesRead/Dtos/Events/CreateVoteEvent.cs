@@ -7,7 +7,7 @@ namespace VotesRead.Dtos.Events;
 public class CreateVoteEvent
 {
    
-    public string Id { get; }
+    public Guid Id { get; }
     
     public string? Type { get; }
     
@@ -15,7 +15,7 @@ public class CreateVoteEvent
     
     public long ReviewId { get; }
 
-    public CreateVoteEvent(string id, string? type, long userId, long reviewId)
+    public CreateVoteEvent(Guid id, string? type, long userId, long reviewId)
     {
         Id = id;
         Type = type;

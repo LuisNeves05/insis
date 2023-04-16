@@ -25,7 +25,7 @@ public class VotesController : ControllerBase
     }
     
     [HttpGet("{id}")]
-    public async Task<ActionResult<HephaestusResponse<List<VoteResponse>>>> GetVote(string id)
+    public async Task<ActionResult<HephaestusResponse<List<VoteResponse>>>> GetVote(Guid id)
     {
         var data = await _voteServices.GetVote(id);
         return data.Data is null ? StatusCode(500) : Ok(data);

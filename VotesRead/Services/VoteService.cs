@@ -30,7 +30,7 @@ public class VoteService : IVoteServices
         }
     }
 
-    public async Task<HephaestusResponse<VoteResponse>> GetVote(string id)
+    public async Task<HephaestusResponse<VoteResponse>> GetVote(Guid id)
     {
         try
         {
@@ -43,18 +43,5 @@ public class VoteService : IVoteServices
         {
             return new HephaestusResponse<VoteResponse>().SetFail(ex);
         }
-    }
-    
-
-    public async void CreateRabbitVote(CreateVoteEvent voteDto)
-    {
-        Vote newVote = new()
-        {
-            Type = voteDto.Type,
-            UserId = voteDto.UserId
-        };
-
-        var result = await _voteRepository.Add(newVote);
-        if (result is null) throw new ArgumentException();
     }
 }

@@ -4,7 +4,6 @@ using System.Text.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using VotesWrite.broker;
-using VotesWrite.Dtos.Events;
 using VotesWrite.Interfaces.RepositoryInterfaces;
 using VotesWrite.Interfaces.ServiceInterfaces;
 using VotesWrite.Repositories.Votes;
@@ -64,7 +63,7 @@ channel.QueueBind(queue: queueName,
 var app = builder.Build();
 
 var consumer = new EventingBasicConsumer(channel);
-consumer.Received += async (model, ea) =>
+consumer.Received += (model, ea) =>
 {
     var body = ea.Body.ToArray();
     var routingKey = ea.RoutingKey;
@@ -74,13 +73,13 @@ consumer.Received += async (model, ea) =>
     switch (routingKey)
     {
         case Constants.voteCreateRk:
-            if (saveService != null) await saveService.CreateVote(newEvent);
+            if (saveService != null)  saveService.CreateVote(newEvent);
             break;
         case Constants.voteUpdateRk:
-            if (saveService != null) await saveService.CreateVote(newEvent);
+            if (saveService != null)  saveService.CreateVote(newEvent);
             break;
         case Constants.voteDeleteRk:
-            if (saveService != null) await saveService.CreateVote(newEvent);
+            if (saveService != null)  saveService.CreateVote(newEvent);
             break;
         default:
             Console.WriteLine($"Unknown routing key: {routingKey}");

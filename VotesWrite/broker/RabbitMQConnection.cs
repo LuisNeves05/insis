@@ -1,4 +1,5 @@
 ﻿using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
 
 namespace VotesWrite.broker;
 
@@ -17,7 +18,8 @@ public sealed class RabbitMQConnection
             HostName = "localhost",
             UserName = "guest",
             Password = "guest",
-            Port = 5672
+            Port = 5672,
+            AutomaticRecoveryEnabled = true
         };
 
         _connection = factory.CreateConnection();
@@ -26,5 +28,19 @@ public sealed class RabbitMQConnection
     public IConnection GetConnection()
     {
         return _connection;
+    }
+
+    public IConnection GetNewConnection()
+    {
+        var factory = new ConnectionFactory
+        {
+            HostName = "localhost",
+            UserName = "guest",
+            Password = "guest",
+            Port = 5672,
+            AutomaticRecoveryEnabled = true
+        };
+
+        return factory.CreateConnection();
     }
 }

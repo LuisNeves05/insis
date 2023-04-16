@@ -7,5 +7,5 @@ namespace VotesRead.Interfaces.ServiceInterfaces;
 public interface IVoteServices
 {
     Task<HephaestusResponse<List<VoteResponse>>> GetAllVotes();
-    Task<HephaestusResponse<VoteResponse>> GetVote(string id);
+    Task<HephaestusResponse<VoteResponse>> GetVote(Guid id);
 }

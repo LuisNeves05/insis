@@ -8,12 +8,10 @@ namespace VotesRead.Repositories;
 
 public class BaseBaseRepository<TEntity> : IBaseRepository<TEntity> where TEntity : Entity
 {
-    
     protected IMongoCollection<TEntity> DataCollection { get; } = null!;
 
-    protected BaseBaseRepository( IOptions<MongoDbSettings> dataStoreDatabaseSettings, string collection)
+    protected BaseBaseRepository(IOptions<MongoDbSettings> dataStoreDatabaseSettings, string collection)
     {
-        
         var mongoClient = new MongoClient(
             dataStoreDatabaseSettings.Value.ConnectionString);
 
@@ -28,14 +26,13 @@ public class BaseBaseRepository<TEntity> : IBaseRepository<TEntity> where TEntit
     }
 
 
-
     public async Task<List<TEntity>> GetAll()
     {
         var data = await DataCollection.Find(_ => true).ToListAsync();
         return data;
     }
 
-    public async Task<TEntity?> Get(string id)
+    public async Task<TEntity?> Get(Guid id)
     {
         var data = await DataCollection.Find(x => x.Id.Equals(id)).FirstOrDefaultAsync();
         return data;
@@ -44,7 +41,7 @@ public class BaseBaseRepository<TEntity> : IBaseRepository<TEntity> where TEntit
     public async Task<TEntity?> Add(TEntity newData)
     {
         await DataCollection.InsertOneAsync(newData);
-        var dataCreated = await Get(newData.Id.ToString());
+        var dataCreated = await Get(newData.Id);
         return dataCreated ?? null;
     }
 
@@ -56,8 +53,8 @@ public class BaseBaseRepository<TEntity> : IBaseRepository<TEntity> where TEntit
     }
 
 
-    public async Task Delete(string id)
+    public async Task Delete(Guid id)
     {
-        await DataCollection.DeleteOneAsync(x => x.Id.Equals(id));
+        await DataCollection.DeleteOneAsync(x => x.Id == id);
     }
 }

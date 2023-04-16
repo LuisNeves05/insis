@@ -10,10 +10,14 @@ public class CreateVoteDto
     
     [Required]
     public long UserId { get; }
+    
+    [Required]
+    public long ReviewId { get; }
 
-    public CreateVoteDto(string? type, long userId)
+    public CreateVoteDto(string? type, long userId, long reviewId)
     {
         Type = type;
         UserId = userId;
+        ReviewId = reviewId;
     }
 }
