@@ -26,7 +26,7 @@ public class ProductServiceImpl implements ProductService {
         final Product p = new Product(product.getSku(), product.getDesignation(), product.getDescription());
         if(repository.findBySku(product.getSku()).orElse(null) == null) {
             Product productUpdated = repository.save(p);
-            publishProductMessage(serializeObject(new CreateProductCommand(productUpdated.getSku(), productUpdated.getDescription(), productUpdated.getDesignation())), RabbitMQConfig.PRODUCT_CREATE_RK);
+            publishProductMessage(serializeObject(new CreateProductCommand(productUpdated.getSku(), productUpdated.getDescription(), productUpdated.getDesignation(), RabbitMQConfig.PRODUCT_CREATE_RK)), RabbitMQConfig.PRODUCT_CREATE_RK);
             return productUpdated.toDto();
         }
         return null;
@@ -45,7 +45,7 @@ public class ProductServiceImpl implements ProductService {
         Product productUpdated = repository.save(productToUpdate.get());
 
         // Send the message to the exchange with the routing key
-        publishProductMessage(serializeObject(new CreateProductCommand(productUpdated.getSku(), productUpdated.getDescription(), productUpdated.getDesignation())), RabbitMQConfig.PRODUCT_UPDATE_RK);
+        publishProductMessage(serializeObject(new CreateProductCommand(productUpdated.getSku(), productUpdated.getDescription(), productUpdated.getDesignation(), RabbitMQConfig.PRODUCT_UPDATE_RK)), RabbitMQConfig.PRODUCT_UPDATE_RK);
 
         return productUpdated.toDto();
     }
@@ -55,7 +55,7 @@ public class ProductServiceImpl implements ProductService {
 
         repository.findBySku(sku).ifPresent(p -> {
             repository.deleteBySku(sku);
-            publishProductMessage(serializeObject(p), RabbitMQConfig.PRODUCT_DELETE_RK);});
+            publishProductMessage(serializeObject(new CreateProductCommand(p.getSku(), p.getDescription(), p.getDesignation(), RabbitMQConfig.PRODUCT_DELETE_RK)), RabbitMQConfig.PRODUCT_DELETE_RK);});
 
     }
 
@@ -68,9 +68,8 @@ public class ProductServiceImpl implements ProductService {
 
     }
 
-    private byte[] serializeObject(Product p) {
-        CreateProductCommand event = new CreateProductCommand(p.getSku(), p.getDescription(), p.getDesignation());
-        return SerializationUtils.serialize(event);
+    private byte[] serializeObject(CreateProductCommand p) {
+        return SerializationUtils.serialize(p);
     }
 
     @Override

@@ -22,7 +22,7 @@ public class RabbitMQConfig {
     public static final String PRODUCT_CREATE_RK = "create-product";
     public static final String PRODUCT_DELETE_RK = "delete-product";
     public static final String PRODUCT_UPDATE_RK = "update-product";
-
+    public static final String BOOTSTRAP_REVIEW = "bootstrap-review";
 
 
     @Bean
@@ -54,10 +54,12 @@ public class RabbitMQConfig {
     Binding binding_add_up_vote(DirectExchange exchange, Queue queue_main) {
         return BindingBuilder.bind(queue_main).to(exchange).with(REVIEW_ADD_UP_VOTE_RK);
     }
+
     @Bean
     Binding binding_add_down_vote(DirectExchange exchange, Queue queue_main) {
         return BindingBuilder.bind(queue_main).to(exchange).with(REVIEW_ADD_DOWN_VOTE_RK);
     }
+
     @Bean
     Binding binding_moderate_review(DirectExchange exchange, Queue queue_main) {
         return BindingBuilder.bind(queue_main).to(exchange).with(REVIEW_MODERATE_RK);
@@ -67,10 +69,12 @@ public class RabbitMQConfig {
     Binding binding_create_product(DirectExchange exchange, Queue queue_main) {
         return BindingBuilder.bind(queue_main).to(exchange).with(PRODUCT_CREATE_RK);
     }
+
     @Bean
     Binding binding_delete_product(DirectExchange exchange, Queue queue_main) {
         return BindingBuilder.bind(queue_main).to(exchange).with(PRODUCT_DELETE_RK);
     }
+
     @Bean
     Binding binding_update_product(DirectExchange exchange, Queue queue_main) {
         return BindingBuilder.bind(queue_main).to(exchange).with(PRODUCT_UPDATE_RK);

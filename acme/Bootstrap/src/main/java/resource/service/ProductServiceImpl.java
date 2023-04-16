@@ -6,59 +6,40 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.utils.SerializationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import resource.model.Product;
-import resource.repository.ProductRepository;
+import resource.model.ProductEvent;
+import resource.repository.ProductEventRepository;
 import resource.service.command_bus.CreateProductCommand;
 
-import java.util.Optional;
+import java.util.List;
 
 @Service
 public class ProductServiceImpl implements ProductService {
     @Autowired
-    private ProductRepository repository;
+    private ProductEventRepository repository;
 
     @Autowired
     private RabbitTemplate rabbitMessagingTemplate;
 
 
     @Override
-    public void createProduct(final CreateProductCommand product) {
-        final Product p = new Product(product.getSku(), product.getDesignation(), product.getDescription());
-
-        if (repository.findBySku(product.getSku()).orElse(null) == null) {
-            repository.save(p);
-        }
-    }
-
-    @Override
-    public void updateProduct(CreateProductCommand product) {
-
-        final Optional<Product> productToUpdate = repository.findBySku(product.getSku());
-
-        if (productToUpdate.isEmpty()) return;
-
-        productToUpdate.get().updateProduct(new Product(product.getSku(), product.getDesignation(), product.getDescription()));
-
-        repository.save(productToUpdate.get());
-    }
-
-    @Override
-    public void deleteProduct(CreateProductCommand p) {
-
-        repository.findBySku(p.getSku()).ifPresent(pr -> repository.deleteBySku(p.getSku()));
-
+    public void saveProductEvent(byte[] event) {
+        List<ProductEvent> productEventList = (List<ProductEvent>) repository.findAll();
+        repository.save(new ProductEvent(event, (long) (productEventList.size() + 1)));
     }
 
     @Override
     public void bootstrap(MessageProperties properties) {
-        Iterable<Product> products = repository.findAll();
-
-        for (Product product : products) {
-            CreateProductCommand createProductCommand = new CreateProductCommand(product.getSku(), product.getDescription(), product.getDesignation());
-            MessageProperties responseProps = new MessageProperties();
-            responseProps.setCorrelationId(properties.getCorrelationId());
-            Message response = new Message(SerializationUtils.serialize(createProductCommand), responseProps);
-            rabbitMessagingTemplate.convertAndSend("", properties.getReplyTo(), response);
+        ProductEvent event = repository.findBySeq(Long.parseLong(properties.getHeader("id").toString())).orElse(null);
+        MessageProperties responseProps = new MessageProperties();
+        responseProps.setCorrelationId(properties.getCorrelationId());
+        Message response;
+        if(event != null) {
+            CreateProductCommand createProductCommand = (CreateProductCommand) SerializationUtils.deserialize(event.getEvent());
+            response = new Message(SerializationUtils.serialize(createProductCommand), responseProps);
+        }else {
+            response = new Message(SerializationUtils.serialize(new byte[0]), responseProps);
         }
+        rabbitMessagingTemplate.convertAndSend("", properties.getReplyTo(), response);
     }
+
 }

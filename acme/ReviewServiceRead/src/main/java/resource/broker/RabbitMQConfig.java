@@ -22,6 +22,7 @@ public class RabbitMQConfig {
     public static final String PRODUCT_DELETE_RK = "delete-product";
     public static final String PRODUCT_UPDATE_RK = "update-product";
     public static final String BOOTSTRAP_PRODUCT = "bootstrap-product";
+    public static final String BOOTSTRAP_REVIEW = "bootstrap-review";
 
     @Bean
     Queue queue_main() {

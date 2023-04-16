@@ -53,6 +53,7 @@ public class Bootstrapper {
         try {
             String correlationId = UUID.randomUUID().toString();
             String replyQueueName = rabbitTemplate.getConnectionFactory().createConnection().createChannel(false).queueDeclare().getQueue();
+
             CountDownLatch latch = new CountDownLatch(1);
 
             MessageProperties properties = new MessageProperties();
@@ -65,6 +66,8 @@ public class Bootstrapper {
             SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
             container.setConnectionFactory(rabbitTemplate.getConnectionFactory());
             container.setQueueNames(replyQueueName);
+            container.setMessageListener(new MessageListenerAdapter(this, "handleResponse"));
+
             container.setMessageListener((MessageListener) message -> {
                 handleResponse(message.getBody());
                 // Count down the latch to indicate that the message has been received
@@ -105,6 +108,7 @@ public class Bootstrapper {
         }
         handleResponseSuccess = response;
     }
+
     //    public boolean requestProduct(Channel channel, String message) throws IOException {
 //        final CompletableFuture<Boolean> value = new CompletableFuture<>();
 //
