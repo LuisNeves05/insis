@@ -53,7 +53,7 @@ public class VoteService : IVoteServices
             if (result.Status == Vote.VoteStatus.Incomplete)
             {
                 CreateIncompleteVoteEvent newEvent =
-                    new CreateIncompleteVoteEvent(result.ProductSku, result.UserId, result.Id);
+                    new CreateIncompleteVoteEvent(voteDto.ProductSku, result.UserId, result.Id);
                 
                 var messageBody = JsonSerializer.SerializeToUtf8Bytes(newEvent);
 

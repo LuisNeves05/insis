@@ -15,9 +15,4 @@ public class Vote : Entity
     
     public VoteStatus Status { get; set; }
     
-    public string? ProductSku { get; }
-
-    
-    
-
 }
