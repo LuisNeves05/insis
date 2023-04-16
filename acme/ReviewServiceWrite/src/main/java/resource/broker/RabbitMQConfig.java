@@ -22,6 +22,8 @@ public class RabbitMQConfig {
     public static final String PRODUCT_CREATE_RK = "create-product";
     public static final String PRODUCT_DELETE_RK = "delete-product";
     public static final String PRODUCT_UPDATE_RK = "update-product";
+    public static final String INCOMPLETE_VOTE = "incomplete-vote-created";
+    public static final String CREATE_REVIEW_FOR_INCOMPLETE_VOTE = "create-review-for-incomplete-vote";
     public static final String BOOTSTRAP_REVIEW = "bootstrap-review";
 
 
@@ -78,6 +80,11 @@ public class RabbitMQConfig {
     @Bean
     Binding binding_update_product(DirectExchange exchange, Queue queue_main) {
         return BindingBuilder.bind(queue_main).to(exchange).with(PRODUCT_UPDATE_RK);
+    }
+
+    @Bean
+    Binding binding_incomplete_vote(DirectExchange exchange, Queue queue_main) {
+        return BindingBuilder.bind(queue_main).to(exchange).with(INCOMPLETE_VOTE);
     }
 
     @Bean

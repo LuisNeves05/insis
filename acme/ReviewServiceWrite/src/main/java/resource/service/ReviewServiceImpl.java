@@ -14,13 +14,9 @@ import resource.model.*;
 import resource.repository.ProductRepository;
 import resource.repository.ReviewRepository;
 import resource.repository.UserRepository;
-import resource.service.command_bus.CreateProductCommand;
-import resource.service.command_bus.CreateReviewCommand;
-import resource.service.command_bus.DeleteReviewCommand;
-import resource.service.command_bus.ModerateReviewCommand;
+import resource.service.command_bus.*;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -208,6 +204,31 @@ public class ReviewServiceImpl implements ReviewService {
 
         if (r.getUpVote().isEmpty() && r.getDownVote().isEmpty()) {
             repository.delete(r);
+        }
+    }
+
+    @Override
+    public void createReviewForVote(final CreateReviewForVoteCommand r){
+        final Product product = pRepository.findBySku(r.getProductSku()).orElse(null);
+
+        final var user = uRepository.getById(r.getUserID());
+
+        assert product != null;
+        if (repository.findByProductIdAndUserId(product, user).isEmpty()) {
+
+            LocalDate date = LocalDate.now();
+
+            String funfact = "123";
+
+            Review review = new Review("", date, product, funfact, null, user);
+
+            Review newReview = repository.save(review);
+
+            ReviewCreatedForIncompleteVote crfvc = new ReviewCreatedForIncompleteVote(r.getVoteID(), newReview.getIdReview());
+
+            publishReviewMessage(serializeCreateObject(review), RabbitMQConfig.REVIEW_CREATE_RK);
+            publishReviewMessage(serializeCreateObject(crfvc), RabbitMQConfig.CREATE_REVIEW_FOR_INCOMPLETE_VOTE);
+
         }
     }
 }
