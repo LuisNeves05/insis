@@ -35,16 +35,16 @@ public class BaseBaseRepository<TEntity> : IBaseRepository<TEntity> where TEntit
         return data;
     }
 
-    public async Task<TEntity?> Get(Guid id)
+    public async Task<TEntity?> Get(string id)
     {
-        var data = await DataCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
+        var data = await DataCollection.Find(x => x.Id.Equals(id)).FirstOrDefaultAsync();
         return data;
     }
 
     public async Task<TEntity?> Add(TEntity newData)
     {
         await DataCollection.InsertOneAsync(newData);
-        var dataCreated = await Get(newData.Id);
+        var dataCreated = await Get(newData.Id.ToString());
         return dataCreated ?? null;
     }
 
@@ -56,8 +56,8 @@ public class BaseBaseRepository<TEntity> : IBaseRepository<TEntity> where TEntit
     }
 
 
-    public async Task Delete(Guid id)
+    public async Task Delete(string id)
     {
-        await DataCollection.DeleteOneAsync(x => x.Id == id);
+        await DataCollection.DeleteOneAsync(x => x.Id.Equals(id));
     }
 }

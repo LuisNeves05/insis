@@ -18,6 +18,9 @@ public class VoteServiceRabbit : IVoteRabbitServices
 
     public async Task<HephaestusResponse<VoteResponse>> CreateVote(CreateVoteEvent? voteEvent)
     {
+        Console.WriteLine("######################################");
+        Console.WriteLine("Received Create Message");
+        Console.WriteLine("######################################");
         Vote newVote = new()
         {
             Type = voteEvent?.Type,

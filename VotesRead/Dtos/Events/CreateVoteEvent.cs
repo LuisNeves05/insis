@@ -2,25 +2,25 @@
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 
-namespace VotesWrite.Dtos.Events;
+namespace VotesRead.Dtos.Events;
 
 public class CreateVoteEvent
 {
    
-    public string id { get; }
+    public string Id { get; }
     
     public string? Type { get; }
     
     public long UserId { get; }
+    
+    public long ReviewId { get; }
 
-    public CreateVoteEvent(string id, string? type, long userId)
+    public CreateVoteEvent(string id, string? type, long userId, long reviewId)
     {
-        this.id = id;
+        Id = id;
         Type = type;
         UserId = userId;
+        ReviewId = reviewId;
     }
-
-    public CreateVoteEvent()
-    {
-    }
+    
 }

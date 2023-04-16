@@ -21,6 +21,7 @@ public class VoteService : IVoteServices
 
     public async Task<HephaestusResponse<VoteResponse>> CreateVote(CreateVoteDto voteDto)
     {
+        
         try
         {
             Vote newVote = new()
@@ -28,16 +29,20 @@ public class VoteService : IVoteServices
                 Type = voteDto.Type,
                 UserId = voteDto.UserId
             };
-
+            
             var result = await _voteRepository.Add(newVote);
+
             if (result is null) throw new ArgumentException();
             CreateVoteEvent createVoteEvent = new CreateVoteEvent(result.Id.ToString(), result.Type, result.UserId);
+            
             var messageBody = JsonSerializer.SerializeToUtf8Bytes(createVoteEvent);
+
             RabitMQProducer.PublishMessage(messageBody, Constants.BrokerConstants.voteCreateRk);
             return new HephaestusResponse<VoteResponse>().SetSucess(Utils.Utils.toDto(result), 1);
         }
         catch (Exception ex)
         {
+            Console.WriteLine(ex);
             return new HephaestusResponse<VoteResponse>().SetFail(ex);
         }
     }

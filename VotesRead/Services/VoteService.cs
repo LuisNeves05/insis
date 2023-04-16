@@ -2,7 +2,7 @@ using VotesRead.Dtos.Response;
 using VotesRead.Entities;
 using VotesRead.Interfaces.RepositoryInterfaces;
 using VotesRead.Interfaces.ServiceInterfaces;
-using VotesWrite.Dtos.Events;
+using VotesRead.Dtos.Events;
 
 namespace VotesRead.Services;
 
@@ -30,7 +30,7 @@ public class VoteService : IVoteServices
         }
     }
 
-    public async Task<HephaestusResponse<VoteResponse>> GetVote(Guid id)
+    public async Task<HephaestusResponse<VoteResponse>> GetVote(string id)
     {
         try
         {

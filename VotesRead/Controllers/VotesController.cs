@@ -7,7 +7,7 @@ using VotesRead.Interfaces.ServiceInterfaces;
 namespace VotesRead.Controllers;
 
 [ApiController]
-[Route("vote")]
+[Route("votes")]
 public class VotesController : ControllerBase
 {
     private readonly IVoteServices _voteServices;
@@ -23,8 +23,9 @@ public class VotesController : ControllerBase
         var data = await _voteServices.GetAllVotes();
         return data.Data is null ? StatusCode(500) : Ok(data);
     }
-    [HttpGet]
-    public async Task<ActionResult<HephaestusResponse<List<VoteResponse>>>> GetVote(Guid id)
+    
+    [HttpGet("{id}")]
+    public async Task<ActionResult<HephaestusResponse<List<VoteResponse>>>> GetVote(string id)
     {
         var data = await _voteServices.GetVote(id);
         return data.Data is null ? StatusCode(500) : Ok(data);

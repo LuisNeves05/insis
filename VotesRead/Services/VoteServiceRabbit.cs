@@ -1,9 +1,8 @@
-﻿
-using VotesRead.Dtos.Response;
+﻿using VotesRead.Dtos.Response;
 using VotesRead.Entities;
 using VotesRead.Interfaces.RepositoryInterfaces;
 using VotesRead.Interfaces.ServiceInterfaces;
-using VotesWrite.Dtos.Events;
+using VotesRead.Dtos.Events;
 using Constants = VotesRead.Constants.BrokerConstants;
 
 namespace VotesRead.Services;
@@ -17,18 +16,32 @@ public class VoteServiceRabbit : IVoteRabbitServices
         _voteRepository = voteRepository;
     }
 
-    public async Task<HephaestusResponse<VoteResponse>> CreateVote(CreateVoteEvent? voteEvent)
+    public async void CreateVote(CreateVoteEvent? voteEvent)
     {
-        Console.WriteLine("ENTROU AQUI AAAEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
+        Console.WriteLine("######################################");
+        Console.WriteLine("Received Create Message");
+        Console.WriteLine("######################################");
 
-        Vote newVote = new()
+        if (_voteRepository.GetVoteByUserIdAndReviewIdAsync(voteEvent.UserId, voteEvent.ReviewId) != null)
         {
-            Type = voteEvent?.Type,
-            UserId = voteEvent!.UserId
-        };
+            Vote newVote = new()
+            {
+                Type = voteEvent?.Type,
+                UserId = voteEvent!.UserId,
+                ReviewId = voteEvent.ReviewId
+            };
 
-        var result = await _voteRepository.Add(newVote);
-        if (result is null) throw new ArgumentException();
-        return new HephaestusResponse<VoteResponse>().SetSucess(Utils.Utils.toDto(result), 1);
+            var result = await _voteRepository.Add(newVote);
+            if (result is null) throw new ArgumentException("Could not create vote");
+        }
+    }
+    
+    public async void DeleteVote(CreateVoteEvent? voteEvent)
+    {
+        Console.WriteLine("######################################");
+        Console.WriteLine("Received Delete Message");
+        Console.WriteLine("######################################");
+
+        await _voteRepository.Delete(voteEvent!.Id);
     }
 }

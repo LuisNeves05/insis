@@ -3,9 +3,9 @@
 public interface IBaseRepository<TEntity>
 {
     Task<List<TEntity>> GetAll();
-    Task<TEntity?> Get(Guid id);
+    Task<TEntity?> Get(string id);
     Task<TEntity?> Add(TEntity newItem);
 
     Task Update(TEntity obj);
-    Task Delete(Guid id);
+    Task Delete(string id);
 }

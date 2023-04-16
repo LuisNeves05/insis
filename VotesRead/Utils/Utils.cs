@@ -6,12 +6,15 @@ namespace VotesRead.Utils;
 public class Utils
 {
     #region Vote Response
+
     public static VoteResponse toDto(Vote data)
     {
         return new VoteResponse()
         {
             Id = data.Id.ToString(),
             Type = data.Type,
+            ReviewId = data.ReviewId,
+            UserId = data.UserId
         };
     }
 
@@ -21,5 +24,4 @@ public class Utils
     }
 
     #endregion
-    
 }

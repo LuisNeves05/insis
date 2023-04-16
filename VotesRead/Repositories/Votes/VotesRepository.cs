@@ -16,6 +16,12 @@ public class VotesRepository : BaseBaseRepository<Vote>, IVotesRepository
     {
         _votesCollection = DataCollection;
     }
+    
+    public async Task<Vote> GetVoteByUserIdAndReviewIdAsync(long userId, long reviewId)
+    {
+        return await _votesCollection.Find(v => v.UserId == userId && v.ReviewId == reviewId).SingleOrDefaultAsync();
+
+    }
 
 
 }

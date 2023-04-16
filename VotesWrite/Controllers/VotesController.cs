@@ -7,7 +7,7 @@ using VotesWrite.Interfaces.ServiceInterfaces;
 namespace VotesWrite.Controllers;
 
 [ApiController]
-[Route("vote")]
+[Route("votes")]
 public class VotesController : ControllerBase
 {
     private readonly IVoteServices _voteServices;

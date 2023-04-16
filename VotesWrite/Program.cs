@@ -48,7 +48,6 @@ builder.Services.AddCors(options =>
 using var connection = RabbitMQConnection.Instance.GetConnection();
 using var channel = connection.CreateModel();
 
-// channel.ExchangeDeclare(exchange: exchangeName, type: ExchangeType.Direct);
 var queueName = channel.QueueDeclare().QueueName;
 channel.QueueBind(queue: queueName,
     exchange: Constants.exchangeName,
@@ -61,17 +60,6 @@ channel.QueueBind(queue: queueName,
 channel.QueueBind(queue: queueName,
     exchange: Constants.exchangeName,
     routingKey: Constants.voteUpdateRk);
-
-static IServiceCollection ConfigureServices()
-{
-    var services = new ServiceCollection();
-
-    services.AddSingleton<IVoteRabbitServices, VoteServiceRabbit>();
-    services.AddSingleton<Program>();
-    services.AddScoped<IVotesRepository, VotesRepository>();
-
-    return services;
-}
 
 var app = builder.Build();
 
@@ -102,9 +90,7 @@ consumer.Received += async (model, ea) =>
 
 channel.BasicConsume(queue: "",
     autoAck: true,
-    consumer: consumer, noLocal: true);
-
-
+    consumer: consumer);
 
 
 // Configure the HTTP request pipeline.

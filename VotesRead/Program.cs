@@ -1,15 +1,13 @@
-using System.Runtime.Serialization;
-using System.Text;
 using System.Text.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using VotesRead.broker;
+using VotesRead.Dtos.Events;
 using VotesRead.Interfaces.RepositoryInterfaces;
 using VotesRead.Interfaces.ServiceInterfaces;
 using VotesRead.Repositories.Votes;
 using VotesRead.Services;
 using VotesRead.Settings;
-using VotesWrite.Dtos.Events;
 using Constants = VotesRead.Constants.BrokerConstants;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -48,7 +46,6 @@ builder.Services.AddCors(options =>
 using var connection = RabbitMQConnection.Instance.GetConnection();
 using var channel = connection.CreateModel();
 
-// channel.ExchangeDeclare(exchange: exchangeName, type: ExchangeType.Direct);
 var queueName = channel.QueueDeclare().QueueName;
 channel.QueueBind(queue: queueName,
     exchange: Constants.exchangeName,
@@ -61,17 +58,6 @@ channel.QueueBind(queue: queueName,
 channel.QueueBind(queue: queueName,
     exchange: Constants.exchangeName,
     routingKey: Constants.voteUpdateRk);
-
-static IServiceCollection ConfigureServices()
-{
-    var services = new ServiceCollection();
-
-    services.AddSingleton<IVoteRabbitServices, VoteServiceRabbit>();
-    services.AddSingleton<Program>();
-    services.AddScoped<IVotesRepository, VotesRepository>();
-
-    return services;
-}
 
 var app = builder.Build();
 
@@ -86,13 +72,13 @@ consumer.Received += async (model, ea) =>
     switch (routingKey)
     {
         case Constants.voteCreateRk:
-            if (saveService != null) await saveService.CreateVote(newEvent);
+            if (saveService != null) saveService.CreateVote(newEvent);
             break;
         case Constants.voteUpdateRk:
-            if (saveService != null) await saveService.CreateVote(newEvent);
+            if (saveService != null) saveService.CreateVote(newEvent);
             break;
         case Constants.voteDeleteRk:
-            if (saveService != null) await saveService.CreateVote(newEvent);
+            if (saveService != null) saveService.DeleteVote(newEvent);
             break;
         default:
             Console.WriteLine($"Unknown routing key: {routingKey}");
@@ -103,8 +89,6 @@ consumer.Received += async (model, ea) =>
 channel.BasicConsume(queue: "",
     autoAck: true,
     consumer: consumer, noLocal: true);
-
-
 
 
 // Configure the HTTP request pipeline.
