@@ -2,7 +2,6 @@
 using VotesRead.Entities;
 using VotesRead.Interfaces.RepositoryInterfaces;
 using VotesRead.Interfaces.ServiceInterfaces;
-using VotesRead.Dtos.Events;
 using Constants = VotesRead.Constants.BrokerConstants;
 
 namespace VotesRead.Services;

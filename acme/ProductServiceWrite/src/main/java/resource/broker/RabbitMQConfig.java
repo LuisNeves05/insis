@@ -35,13 +35,18 @@ public class RabbitMQConfig {
     Binding binding_create(DirectExchange exchange, Queue queue_main) {
         return BindingBuilder.bind(queue_main).to(exchange).with(PRODUCT_CREATE_RK);
     }
+
     @Bean
     Binding binding_delete(DirectExchange exchange, Queue queue_main) {
         return BindingBuilder.bind(queue_main).to(exchange).with(PRODUCT_DELETE_RK);
-    }@Bean
+    }
+
+    @Bean
     Binding binding_update(DirectExchange exchange, Queue queue_main) {
         return BindingBuilder.bind(queue_main).to(exchange).with(PRODUCT_UPDATE_RK);
     }
+
+
 
     @Bean
     public Jackson2JsonMessageConverter messageConverter() {

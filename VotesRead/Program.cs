@@ -2,7 +2,6 @@ using System.Text.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using VotesRead.broker;
-using VotesRead.Dtos.Events;
 using VotesRead.Interfaces.RepositoryInterfaces;
 using VotesRead.Interfaces.ServiceInterfaces;
 using VotesRead.Repositories.Votes;

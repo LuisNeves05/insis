@@ -4,6 +4,7 @@ using System.Text.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using VotesWrite.broker;
+using VotesWrite.Dtos.Events;
 using VotesWrite.Interfaces.RepositoryInterfaces;
 using VotesWrite.Interfaces.ServiceInterfaces;
 using VotesWrite.Repositories.Votes;
@@ -60,6 +61,10 @@ channel.QueueBind(queue: queueName,
     exchange: Constants.exchangeName,
     routingKey: Constants.voteUpdateRk);
 
+channel.QueueBind(queue: queueName,
+    exchange: Constants.exchangeName,
+    routingKey: Constants.createReviewForIncompleteVote);
+
 var app = builder.Build();
 
 var consumer = new EventingBasicConsumer(channel);
@@ -67,19 +72,23 @@ consumer.Received += (model, ea) =>
 {
     var body = ea.Body.ToArray();
     var routingKey = ea.RoutingKey;
-    var newEvent =  JsonSerializer.Deserialize<CreateVoteEvent>(body);
+    var createEvent =  JsonSerializer.Deserialize<CreateVoteEvent>(body);
+    var updateEvent =  JsonSerializer.Deserialize<UpdateVoteEvent>(body);
     var saveService = app.Services.GetService<IVoteRabbitServices>();
 
     switch (routingKey)
     {
         case Constants.voteCreateRk:
-            if (saveService != null)  saveService.CreateVote(newEvent);
+            if (saveService != null)  saveService.CreateVote(createEvent);
             break;
         case Constants.voteUpdateRk:
-            if (saveService != null)  saveService.CreateVote(newEvent);
+            if (saveService != null)  saveService.DeleteVote(createEvent);
             break;
         case Constants.voteDeleteRk:
-            if (saveService != null)  saveService.CreateVote(newEvent);
+            if (saveService != null)  saveService.CreateVote(createEvent);
+            break;
+        case Constants.createReviewForIncompleteVote:
+            if (saveService != null)  saveService.UpdateIncompleteVote(updateEvent);
             break;
         default:
             Console.WriteLine($"Unknown routing key: {routingKey}");

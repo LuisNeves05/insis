@@ -2,6 +2,7 @@ using System.Text.Json;
 using Microsoft.VisualBasic.CompilerServices;
 using VotesWrite.broker;
 using VotesWrite.Dtos.Create;
+using VotesWrite.Dtos.Events;
 using VotesWrite.Dtos.Response;
 using VotesWrite.Entities;
 using VotesWrite.Interfaces.RepositoryInterfaces;
@@ -20,23 +21,54 @@ public class VoteService : IVoteServices
 
     public async Task<HephaestusResponse<VoteResponse>> CreateVote(CreateVoteDto voteDto)
     {
-        
         try
         {
-            Vote newVote = new()
+            Vote newVote;
+            if (voteDto.ReviewId == 0)
             {
-                Type = voteDto.Type,
-                UserId = voteDto.UserId
-            };
-            
+                newVote = new()
+                {
+                    Type = voteDto.Type,
+                    UserId = voteDto.UserId,
+                    ReviewId = voteDto.ReviewId,
+                    Status = Vote.VoteStatus.Incomplete
+                };
+            }
+            else
+            {
+                newVote = new()
+                {
+                    Type = voteDto.Type,
+                    UserId = voteDto.UserId,
+                    ReviewId = voteDto.ReviewId,
+                    Status = Vote.VoteStatus.Complete
+                };
+            }
+
             var result = await _voteRepository.Add(newVote);
 
             if (result is null) throw new ArgumentException();
-            CreateVoteEvent createVoteEvent = new CreateVoteEvent(result.Id, result.Type, result.UserId, result.ReviewId);
-            
-            var messageBody = JsonSerializer.SerializeToUtf8Bytes(createVoteEvent);
 
-            RabitMQProducer.PublishMessage(messageBody, Constants.BrokerConstants.voteCreateRk);
+
+            if (result.Status == Vote.VoteStatus.Incomplete)
+            {
+                CreateIncompleteVoteEvent newEvent =
+                    new CreateIncompleteVoteEvent(result.ProductSku, result.UserId, result.Id);
+                
+                var messageBody = JsonSerializer.SerializeToUtf8Bytes(newEvent);
+
+                RabitMQProducer.PublishMessage(messageBody, Constants.BrokerConstants.incompleteVoteRk);
+            }
+            else
+            {
+                CreateVoteEvent createVoteEvent =
+                    new CreateVoteEvent(result.Id, result.Type, result.UserId, result.ReviewId, result.Status);
+
+                var messageBody = JsonSerializer.SerializeToUtf8Bytes(createVoteEvent);
+
+                RabitMQProducer.PublishMessage(messageBody, Constants.BrokerConstants.voteCreateRk);
+            }
+
             return new HephaestusResponse<VoteResponse>().SetSucess(Utils.Utils.toDto(result), 1);
         }
         catch (Exception ex)
@@ -67,15 +99,15 @@ public class VoteService : IVoteServices
         }
     }
 
-    public async Task<HephaestusResponse<VoteResponse>> UpdateVote(Guid id, CreateVoteDto clientDto)
+    public async Task<HephaestusResponse<VoteResponse>> UpdateVote(Guid id, CreateVoteDto voteDto)
     {
         try
         {
             var vote = await _voteRepository.Get(id);
             if (vote is null) throw new ArgumentException("Vote not Found with that specific id");
 
-            vote.Type = clientDto.Type;
-            vote.UserId = clientDto.UserId;
+            vote.Type = voteDto.Type;
+            vote.UserId = voteDto.UserId;
             vote.Changed = DateTime.Now;
 
             await _voteRepository.Update(vote);

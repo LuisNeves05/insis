@@ -2,7 +2,6 @@ using VotesRead.Dtos.Response;
 using VotesRead.Entities;
 using VotesRead.Interfaces.RepositoryInterfaces;
 using VotesRead.Interfaces.ServiceInterfaces;
-using VotesRead.Dtos.Events;
 
 namespace VotesRead.Services;
 

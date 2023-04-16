@@ -41,6 +41,7 @@ public class ProductServiceRabbit {
             case RabbitMQConfig.PRODUCT_CREATE_RK -> service.create(event);
             case RabbitMQConfig.PRODUCT_DELETE_RK -> service.deleteBySku(event);
             case RabbitMQConfig.PRODUCT_UPDATE_RK -> service.updateBySku(event);
+
         }
     }
 

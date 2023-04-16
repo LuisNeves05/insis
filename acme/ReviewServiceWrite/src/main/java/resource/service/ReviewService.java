@@ -6,6 +6,7 @@ import resource.dto.VoteReviewDTO;
 import resource.model.Product;
 import resource.model.Review;
 import resource.service.command_bus.CreateReviewCommand;
+import resource.service.command_bus.CreateReviewForVoteCommand;
 import resource.service.command_bus.DeleteReviewCommand;
 import resource.service.command_bus.ModerateReviewCommand;
 
@@ -29,4 +30,6 @@ public interface ReviewService {
     void moderateReview(ModerateReviewCommand mr);
 
     void create(final CreateReviewCommand r);
+
+    void createReviewForVote(final CreateReviewForVoteCommand r);
 }

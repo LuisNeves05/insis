@@ -15,10 +15,7 @@ import resource.model.Product;
 import resource.repository.ProductRepository;
 import org.springframework.messaging.handler.annotation.Header;
 import resource.repository.ReviewRepository;
-import resource.service.command_bus.CreateProductCommand;
-import resource.service.command_bus.CreateReviewCommand;
-import resource.service.command_bus.DeleteReviewCommand;
-import resource.service.command_bus.ModerateReviewCommand;
+import resource.service.command_bus.*;
 
 import java.util.Optional;
 
@@ -59,9 +56,6 @@ public class ReviewServiceRabbit {
                         (DeleteReviewCommand) SerializationUtils.deserialize(messageBytes);
                 service.deleteReview(deleteReviewCommand);
             }
-            // TODO VER ISTO DOS VOTOS E COMO VAI FICAR
-            /*case RabbitMQConfig.REVIEW_ADD_DOWN_VOTE_RK -> service.addVoteToReview();
-            case RabbitMQConfig.REVIEW_ADD_UP_VOTE_RK -> service.addVoteToReview(); */
             case RabbitMQConfig.REVIEW_MODERATE_RK -> {
                 ModerateReviewCommand moderateReviewCommand =
                         (ModerateReviewCommand) SerializationUtils.deserialize(messageBytes);
@@ -79,6 +73,11 @@ public class ReviewServiceRabbit {
                 CreateProductCommand event = (CreateProductCommand) SerializationUtils.deserialize(messageBytes);
                 productService.updateBySku(event);
             }
+            case RabbitMQConfig.INCOMPLETE_VOTE -> {
+                CreateReviewForVoteCommand event = (CreateReviewForVoteCommand) SerializationUtils.deserialize(messageBytes);
+                service.createReviewForVote(event);
+            }
+
         }
     }
 
