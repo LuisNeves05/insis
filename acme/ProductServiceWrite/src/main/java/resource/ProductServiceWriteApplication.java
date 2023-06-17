@@ -12,6 +12,4 @@ public class ProductServiceWriteApplication {
         SpringApplication.run(ProductServiceWriteApplication.class, args);
     }
 
-    @Value("${server.instance.id}")
-    String instanceId;
 }

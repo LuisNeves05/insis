@@ -100,21 +100,6 @@ services:
 
     restart: unless-stopped
 
-  product-command-application:
-    build:
-      context: ./ProductServiceWrite
-      dockerfile: Dockerfile
-    ports:
-      - "8083:8083"
-    networks:
-      - product-command-application
-    environment:
-      spring.jpa.properties.hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
-      spring.datasource.url: jdbc:postgresql://localhost:5432/product-db-w
-      spring.datasource.username: root
-      spring.datasource.password: password
-      spring.jpa.hibernate.ddl-auto: create-drop
-
 networks:
   postgres-product-w:
     driver: bridge

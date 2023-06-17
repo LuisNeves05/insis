@@ -9,7 +9,4 @@ public class ReviewServiceWriteApplication {
     public static void main(String[] args) {
         SpringApplication.run(ReviewServiceWriteApplication.class, args);
     }
-
-    @Value("${server.instance.id}")
-    String instanceId;
 }

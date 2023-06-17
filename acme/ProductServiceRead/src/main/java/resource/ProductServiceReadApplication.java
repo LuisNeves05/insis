@@ -11,7 +11,4 @@ public class ProductServiceReadApplication {
     public static void main(String[] args) {
         SpringApplication.run(ProductServiceReadApplication.class, args);
     }
-
-    @Value("${server.instance.id}")
-    String instanceId;
 }
