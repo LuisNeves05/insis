@@ -11,8 +11,10 @@ public class ReviewDTO {
     private String funFact;
     private Double rating;
     private Integer vote;
+    private Long userId;
+    private String product;
 
-    public ReviewDTO(Long idReview, String reviewText, LocalDate publishingDate, String approvalStatus, String funFact, Double rating, Integer vote) {
+    public ReviewDTO(Long idReview, String reviewText, LocalDate publishingDate, String approvalStatus, String funFact, Double rating, Integer vote, Long userId, String product) {
         this.idReview = idReview;
         this.reviewText = reviewText;
         this.publishingDate = publishingDate;
@@ -20,6 +22,8 @@ public class ReviewDTO {
         this.funFact = funFact;
         this.rating = rating;
         this.vote = vote;
+        this.userId = userId;
+        this.product = product;
     }
 
     public void setIdReview( Long idReview ) {
@@ -78,4 +82,19 @@ public class ReviewDTO {
         this.vote = vote;
     }
 
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public String getProduct() {
+        return product;
+    }
+
+    public void setProduct(String product) {
+        this.product = product;
+    }
 }
