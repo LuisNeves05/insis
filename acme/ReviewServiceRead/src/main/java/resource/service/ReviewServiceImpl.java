@@ -21,6 +21,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import static resource.model.ReviewMapper.toDtoList;
+
 @Service
 @Transactional
 public class ReviewServiceImpl implements ReviewService {
@@ -147,6 +149,12 @@ public class ReviewServiceImpl implements ReviewService {
         return r.map(ReviewMapper::toDtoList).orElse(null);
 
     }
+    @Override
+    public List<ReviewDTO> findAllReviews() {
+        List<Review> r = (List<Review>) repository.findAll();
+
+        return toDtoList(r);
+    }
 
     @Override
     public ReviewDTO moderateReview(Long reviewID, String approved) throws ResourceNotFoundException, IllegalArgumentException {
@@ -181,7 +189,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         if (r.isEmpty()) return null;
 
-        return ReviewMapper.toDtoList(r.get());
+        return toDtoList(r.get());
     }
 
     @Override

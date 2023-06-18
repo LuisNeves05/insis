@@ -103,4 +103,13 @@ class ReviewController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @Operation(summary = "gets pedding reviews")
+    @GetMapping("/reviews")
+    public ResponseEntity<List<ReviewDTO>> getAllReviews(){
+
+        List<ReviewDTO> r = rService.findAllReviews();
+
+        return ResponseEntity.ok().body(r);
+    }
 }
