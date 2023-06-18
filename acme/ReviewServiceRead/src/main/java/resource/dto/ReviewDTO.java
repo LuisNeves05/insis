@@ -11,10 +11,10 @@ public class ReviewDTO {
     private String funFact;
     private Double rating;
     private Integer vote;
-    private String userId;
+    private String username;
     private String product;
 
-    public ReviewDTO(Long idReview, String reviewText, LocalDate publishingDate, String approvalStatus, String funFact, Double rating, Integer vote, String userId, String product) {
+    public ReviewDTO(Long idReview, String reviewText, LocalDate publishingDate, String approvalStatus, String funFact, Double rating, Integer vote, String username, String product) {
         this.idReview = idReview;
         this.reviewText = reviewText;
         this.publishingDate = publishingDate;
@@ -22,7 +22,7 @@ public class ReviewDTO {
         this.funFact = funFact;
         this.rating = rating;
         this.vote = vote;
-        this.userId = userId;
+        this.username = username;
         this.product = product;
     }
 
@@ -83,11 +83,11 @@ public class ReviewDTO {
     }
 
     public String getUserId() {
-        return userId;
+        return username;
     }
 
     public void setUserId(String userId) {
-        this.userId = userId;
+        this.username = userId;
     }
 
     public String getProduct() {
