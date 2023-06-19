@@ -1,10 +1,15 @@
 package resource.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class CreateReviewDTO {
 
     private String reviewText;
 
-    private Long userID;
+    private String username;
 
     private Double rating;
 
@@ -16,29 +21,5 @@ public class CreateReviewDTO {
 
     public CreateReviewDTO(Double rating) {
         this.rating = rating;
-    }
-
-    public Double getRating() {
-        return rating;
-    }
-
-    public void setRating(Double rating) {
-        this.rating = rating;
-    }
-
-    public String getReviewText() {
-        return reviewText;
-    }
-
-    public void setReviewText(String reviewText) {
-        this.reviewText = reviewText;
-    }
-
-    public Long getUserID() {
-        return userID;
-    }
-
-    public void setUserID(Long userID) {
-        this.userID = userID;
     }
 }

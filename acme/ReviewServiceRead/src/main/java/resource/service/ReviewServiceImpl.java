@@ -48,7 +48,9 @@ public class ReviewServiceImpl implements ReviewService {
 
         if (product.isEmpty()) return null;
 
-        final var user = uRepository.getById(createReviewDTO.getUserID());
+        final var user = uRepository.findByUsername(createReviewDTO.getUsername());
+
+        if (user.isEmpty()) return null;
 
         Rating rating = null;
         Optional<Rating> r = ratingService.findByRate(createReviewDTO.getRating());
@@ -60,7 +62,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         String funfact = "123123";
 
-        Review review = new Review(createReviewDTO.getReviewText(), date, product.orElse(null), funfact, rating, user);
+        Review review = new Review(createReviewDTO.getReviewText(), date, product.orElse(null), funfact, rating, user.orElse(null));
 
         review = repository.save(review);
 
