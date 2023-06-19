@@ -182,16 +182,14 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public List<ReviewDTO> findReviewsByUser(Long userID) {
 
-        // final Optional<User> user = uRepository.findById(userID);
+        final Optional<UserR> user = uRepository.findById(userID);
 
-        // if(user.isEmpty()) return null;
+        if(user.isEmpty()) return null;
 
-        // TODO remove null
-        Optional<List<Review>> r = repository.findByUserId(null);
+        Optional<List<Review>> r = repository.findByUserId(user.orElse(null));
 
-        if (r.isEmpty()) return null;
+        return r.map(ReviewMapper::toDtoList).orElse(null);
 
-        return toDtoList(r.get());
     }
 
     @Override
