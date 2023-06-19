@@ -13,3 +13,13 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8086:8085"
+  
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_DATABASE: INSIS
+    volumes:
+      - ./data:/data/db
+    ports:
+      - 27017:27017
