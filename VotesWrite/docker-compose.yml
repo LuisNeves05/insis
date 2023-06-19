@@ -10,3 +10,12 @@ services:
     ports:
       - "8088:8087"
   
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_DATABASE: INSIS2
+    volumes:
+      - ./data:/data/db
+    ports:
+      - 27018:27017
