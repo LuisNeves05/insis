@@ -16,6 +16,9 @@
         <module>ReviewServiceWrite</module>
         <module>Bootstrap</module>
         <module>LoadBalancer</module>
+        <module>VoteServiceRead</module>
+        <module>VoteServiceWrite</module>
+
     </modules>
 
     <name>ACME</name>

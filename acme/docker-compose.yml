@@ -85,6 +85,38 @@ services:
       - postgres-review-r
     restart: unless-stopped
 
+  postgres-vote-w:
+    container_name: Vote-db-w
+    image: postgres
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: vote-db-w
+      PGDATA: /data/postgresVoteW
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - "5437:5432"
+    networks:
+      - postgres-review-r
+    restart: unless-stopped
+
+  postgres-vote-r:
+    container_name: Vote-db-r
+    image: postgres
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: vote-db-r
+      PGDATA: /data/postgresVoteR
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - "5438:5432"
+    networks:
+      - postgres-vote-r
+    restart: unless-stopped
+
   ##Adminer
   adminer:
     container_name: adminer
@@ -97,6 +129,8 @@ services:
       - postgres-product-w
       - postgres-review-w
       - postgres-bootstrap
+      - postgres-vote-w
+      - postgres-vote-r
 
     restart: unless-stopped
 
@@ -110,6 +144,10 @@ networks:
   postgres-review-r:
     driver: bridge
   postgres-bootstrap:
+    driver: bridge
+  postgres-vote-w:
+    driver: bridge
+  postgres-vote-r:
     driver: bridge
   product-command-application:
     driver: bridge
