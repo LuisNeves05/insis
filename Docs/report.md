@@ -23,6 +23,10 @@ per minute, at a burst request max of 800 requests per second.
 
 ![Stripe Dashboard Policy](./images/StripePolitica.png)
 
+![ProductWrite Subscribe](./images/ProductWriteSubscribers.png)
+
+![API Subscribed](./images/APIsSubscribed.png)
+
 ## Authorization Policies
 
 Authorization policies are in place to ensure secure access to the ACME API. 
@@ -52,4 +56,12 @@ with a throttling error or delay the processing of additional requests.
 
 
 ## Monitorization Policies
+
+For Monitoring, the team used Choreo. The documentation mentions API Analytics but 
+upon further investigation we soon realized it was deprecated and the best 
+alternative was in fact Choreo.
+
+![Choreo](./images/Choreo.png)
+
+![Choreo Insights](./images/ChoreoInsights.png)
 
