@@ -206,17 +206,14 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         assert product != null;
-        if (repository.findByProductIdAndUserId(product, user).isEmpty()) {
 
-            LocalDate date = LocalDate.now();
+        LocalDate date = LocalDate.now();
 
-            String funfact = "123";
+        String funfact = "123";
 
-            Review review = new Review(r.getReviewText(), date, product, funfact, rating, user);
+        Review review = new Review(r.getReviewText(), date, product, funfact, rating, user);
 
-            repository.save(review);
-        }
-
+        repository.save(review);
     }
     @Override
     public void moderateReview(ModerateReviewCommand mr) throws ResourceNotFoundException, IllegalArgumentException {

@@ -4,18 +4,23 @@ import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
-import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.utils.SerializationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import resource.model.UserR;
+import resource.repository.UserRepository;
 import resource.service.ProductService;
 import resource.service.ReviewService;
-import resource.service.command_bus.*;
+import resource.service.command_bus.CreateProductCommand;
+import resource.service.command_bus.CreateReviewCommand;
+import resource.service.command_bus.DeleteReviewCommand;
+import resource.service.command_bus.ModerateReviewCommand;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -31,6 +36,9 @@ public class Bootstrapper {
     @Autowired
     private ReviewService service;
 
+    @Autowired
+    private UserRepository repository;
+
     private boolean handleResponseSuccess = true;
 
     @Autowired
@@ -40,6 +48,11 @@ public class Bootstrapper {
 
     @EventListener
     public void onApplicationEvent(ContextRefreshedEvent event) {
+        System.out.println("################################");
+        List<UserR> r = (List<UserR>) repository.findAll();
+        for(UserR us : r){
+            System.out.println(us);
+        }
         int i = 1;
         do {
             String i_str = Integer.toString(i);

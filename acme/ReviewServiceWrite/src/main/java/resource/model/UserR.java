@@ -29,6 +29,13 @@ public class UserR {
         this.username = username;
     }
 
+    @Override
+    public String toString() {
+        return "UserR{" +
+                "userId=" + userId +
+                ", username='" + username + '\'' +
+                '}';
+    }
 
 }
 

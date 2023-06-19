@@ -11,11 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import resource.model.UserR;
+import resource.repository.UserRepository;
 import resource.service.ProductService;
 import resource.service.ReviewService;
 import resource.service.command_bus.*;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -31,6 +34,9 @@ public class Bootstrapper {
     @Autowired
     private ReviewService service;
 
+    @Autowired
+    private UserRepository repository;
+
     private boolean handleResponseSuccess = true;
 
     @Autowired
@@ -40,6 +46,14 @@ public class Bootstrapper {
 
     @EventListener
     public void onApplicationEvent(ContextRefreshedEvent event) {
+       // repository.save(new UserR("joaquim"));
+       // repository.save(new UserR("fernando"));
+       // repository.save(new UserR("alberto"));
+        System.out.println("################################");
+        List<UserR> r = (List<UserR>) repository.findAll();
+        for(UserR us : r){
+            System.out.println(us);
+        }
         int i = 1;
         do {
             String i_str = Integer.toString(i);

@@ -13,7 +13,7 @@ public class Vote {
     @Id
     @GeneratedValue
     private Long voteId;
-    @Column(unique = true)
+    @Column(nullable = false)
     private String username;
     @Column(nullable = false)
     private String status;
